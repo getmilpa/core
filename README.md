@@ -53,8 +53,8 @@ Every public symbol carries a DocBlock — the API reference is generated straig
 
 ## Documentation
 
-Full API reference: **coming soon** on GitHub Pages, generated from the source DocBlocks
-and dressed with the Milpa design system.
+**Full API reference: [getmilpa.github.io/core](https://getmilpa.github.io/core/)** — generated
+straight from the source DocBlocks and dressed with the Milpa design system.
 
 ## Contributing
 
