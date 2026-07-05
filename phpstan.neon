@@ -2,9 +2,3 @@ parameters:
     level: 6
     paths:
         - src
-    ignoreErrors:
-        -
-            # expected: trait consumed by downstream plugins, not in-package
-            message: '#^Trait Milpa\\app\\Support\\UuidGenerator is used zero times and is not analysed\.$#'
-            identifier: trait.unused
-            path: src/Support/UuidGenerator.php
