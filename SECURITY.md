@@ -13,3 +13,7 @@ a public issue or pull request.
 We aim to acknowledge a report within 72 hours and to keep you informed as we work
 on a fix. Once a fix is released, we will credit the reporter unless anonymity is
 requested.
+
+---
+
+Milpa is developed and maintained by [TeamX Agency](https://teamx.agency).

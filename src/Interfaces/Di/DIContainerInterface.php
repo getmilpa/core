@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\Interfaces\Di;
+namespace Milpa\Interfaces\Di;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -30,7 +39,7 @@ interface DIContainerInterface extends ContainerInterface
      * already-built instance (set directly on the container). An explicit
      * registration made here takes precedence over on-demand {@see resolve()}
      * autowiring for the same identifier. This is the method a
-     * {@see \Milpa\app\Attributes\RegisterService} scanner calls after
+     * {@see \Milpa\Attributes\RegisterService} scanner calls after
      * instantiating an annotated class.
      */
     public function registerService(string $id, string|object $classOrInstance): void;

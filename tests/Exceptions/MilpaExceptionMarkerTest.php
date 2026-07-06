@@ -1,16 +1,25 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
 namespace Milpa\Tests\Exceptions;
 
-use Milpa\app\Exceptions\AttributeNotFoundException;
-use Milpa\app\Exceptions\AuthenticationException;
-use Milpa\app\Exceptions\CircularDependencyException;
-use Milpa\app\Exceptions\ContainerResolutionException;
-use Milpa\app\Exceptions\InvalidAttributeValueException;
-use Milpa\app\Exceptions\MilpaExceptionInterface;
-use Milpa\app\Exceptions\ServiceNotFoundException;
+use Milpa\Exceptions\AttributeNotFoundException;
+use Milpa\Exceptions\AuthenticationException;
+use Milpa\Exceptions\CircularDependencyException;
+use Milpa\Exceptions\ContainerResolutionException;
+use Milpa\Exceptions\InvalidAttributeValueException;
+use Milpa\Exceptions\MilpaExceptionInterface;
+use Milpa\Exceptions\ServiceNotFoundException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;

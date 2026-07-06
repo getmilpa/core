@@ -1,12 +1,21 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\Interfaces\Plugin;
+namespace Milpa\Interfaces\Plugin;
 
-use Milpa\app\DTO\DependencyResolution;
-use Milpa\app\DTO\PluginInstallResult;
-use Milpa\app\DTO\PluginRemoveResult;
+use Milpa\DTO\DependencyResolution;
+use Milpa\DTO\PluginInstallResult;
+use Milpa\DTO\PluginRemoveResult;
 
 /**
  * Installs, updates, and removes plugins from remote sources (GitHub).
@@ -18,15 +27,15 @@ interface PluginInstallerInterface
      *
      * @param string $source "owner/repo", "owner/repo:^2.0", or full GitHub URL
      *
-     * @throws \Milpa\app\Exceptions\Plugin\PluginInstallException If the plugin fails to install.
-     * @throws \Milpa\app\Exceptions\Plugin\PluginDependencyException If a required dependency is unmet.
+     * @throws \Milpa\Exceptions\Plugin\PluginInstallException If the plugin fails to install.
+     * @throws \Milpa\Exceptions\Plugin\PluginDependencyException If a required dependency is unmet.
      */
     public function require(string $source): PluginInstallResult;
 
     /**
      * Update an installed plugin to the latest compatible version.
      *
-     * @throws \Milpa\app\Exceptions\Plugin\PluginInstallException If the plugin fails to update.
+     * @throws \Milpa\Exceptions\Plugin\PluginInstallException If the plugin fails to update.
      */
     public function update(string $pluginName, ?string $targetVersion = null): PluginInstallResult;
 

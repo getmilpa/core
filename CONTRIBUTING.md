@@ -27,7 +27,8 @@ These run in CI on PHP 8.3 and 8.4 (alongside `composer validate --strict` and a
 - **[Conventional Commits](https://www.conventionalcommits.org/)** — releases and
   the CHANGELOG are generated automatically from commit messages. Use
   `feat:` / `fix:` / `docs:` / `chore:` etc.; a breaking change to a public
-  interface or capability schema is a `feat!:` / `BREAKING CHANGE:` (MAJOR).
+  interface or capability schema is a `feat!:` / `BREAKING CHANGE:` (bumps MINOR
+  while the package is `0.x`, MAJOR once it reaches `1.0`).
 
 ## Pull requests
 
@@ -39,3 +40,7 @@ release-please will handle versioning.
 
 By contributing, you agree that your contributions are licensed under the
 [Apache License 2.0](LICENSE).
+
+---
+
+Milpa is developed and maintained by [TeamX Agency](https://teamx.agency).

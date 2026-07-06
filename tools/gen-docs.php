@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
 /**
@@ -18,10 +27,20 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 // space is captured; optional (`::`) only binds `--css-base=/ds`. getopt yields
 // `false` for a flag it can't bind a value to, so guard with is_string, not `??`
 // (which only rescues null) before falling back to the default.
-$opts = getopt('', ['out:', 'css-base:']);
+$opts = getopt('', ['out:', 'css-base:', 'version:']);
 $out = is_string($opts['out'] ?? null) ? $opts['out'] : 'build/docs';
-$cssBase = is_string($opts['css-base'] ?? null) ? $opts['css-base'] : 'https://cdn.jsdelivr.net/npm/@milpa/design@0.3.0';
+$cssBase = is_string($opts['css-base'] ?? null) ? $opts['css-base'] : 'https://cdn.jsdelivr.net/npm/@milpa/design@0.8.0';
 
-$count = (new Milpa\Docs\SiteGenerator(dirname(__DIR__) . '/src', $out, $cssBase))->generate();
-echo "generated {$count} page(s) to {$out} (css-base: {$cssBase})\n";
+// Version shown in the docs chrome (topbar badge, title, footer). Prefer an
+// explicit --version; otherwise read the release-please manifest at the repo
+// root (present in the published repo); fall back to "dev" for local builds.
+$version = is_string($opts['version'] ?? null) ? $opts['version'] : null;
+if ($version === null) {
+    $manifest = dirname(__DIR__) . '/.release-please-manifest.json';
+    $data = is_file($manifest) ? json_decode((string) file_get_contents($manifest), true) : null;
+    $version = is_array($data) && is_string($data['.'] ?? null) ? $data['.'] : 'dev';
+}
+
+$count = (new Milpa\Docs\SiteGenerator(dirname(__DIR__) . '/src', $out, $cssBase, $version))->generate();
+echo "generated {$count} page(s) to {$out} (v{$version}, css-base: {$cssBase})\n";
 exit(0);

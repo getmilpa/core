@@ -1,13 +1,22 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
 namespace Milpa\Tests\Verification;
 
 use PHPUnit\Framework\TestCase;
-use Milpa\app\Enums\ApprovalPolicy;
-use Milpa\app\ValueObjects\Verification\VerificationContext;
-use Milpa\app\ValueObjects\Verification\VerificationRequest;
+use Milpa\Enums\ApprovalPolicy;
+use Milpa\ValueObjects\Verification\VerificationContext;
+use Milpa\ValueObjects\Verification\VerificationRequest;
 
 /**
  * the request (what is being verified + under which policy) and the context

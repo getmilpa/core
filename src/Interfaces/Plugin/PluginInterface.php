@@ -1,10 +1,19 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\Interfaces\Plugin;
+namespace Milpa\Interfaces\Plugin;
 
-use Milpa\app\Interfaces\Di\DIContainerInterface;
+use Milpa\Interfaces\Di\DIContainerInterface;
 
 /**
  * The lifecycle contract every Milpa plugin's main class must implement.
@@ -21,7 +30,7 @@ interface PluginInterface
      * Boots the plugin: registers services, routes, event listeners, etc.
      * Called on every enabled plugin during application bootstrap.
      *
-     * @throws \Milpa\app\Exceptions\Plugin\PluginBootException If the plugin fails to boot.
+     * @throws \Milpa\Exceptions\Plugin\PluginBootException If the plugin fails to boot.
      */
     public function boot(): void;
 

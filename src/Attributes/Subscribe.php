@@ -1,12 +1,21 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\Attributes;
+namespace Milpa\Attributes;
 
 use Attribute;
-use Milpa\app\Enums\DispatcherType;
-use Milpa\app\Enums\ListenerPriority;
+use Milpa\Enums\DispatcherType;
+use Milpa\Enums\ListenerPriority;
 
 /**
  * Marks a class or method as an event subscriber.
@@ -26,7 +35,7 @@ use Milpa\app\Enums\ListenerPriority;
  * @example Explicit dispatcher selection:
  * #[Subscribe(event: 'ai.tool.invoked', dispatcher: DispatcherType::MILPA)]
  *
- * @package Milpa\app\Attributes
+ * @package Milpa\Attributes
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class Subscribe

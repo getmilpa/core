@@ -10,15 +10,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Milpa\\app\\Exceptions\\": "src/Exceptions/",
-            "Milpa\\app\\ValueObjects\\": "src/ValueObjects/",
-            "Milpa\\app\\DTO\\": "src/DTO/",
-            "Milpa\\app\\Enums\\": "src/Enums/",
-            "Milpa\\app\\Attributes\\": "src/Attributes/",
-            "Milpa\\app\\Events\\": "src/Events/",
-            "Milpa\\app\\Services\\": "src/Services/",
-            "Milpa\\app\\Interfaces\\": "src/Interfaces/",
-            "Milpa\\app\\Support\\": "src/Support/"
+            "Milpa\\Exceptions\\": "src/Exceptions/",
+            "Milpa\\ValueObjects\\": "src/ValueObjects/",
+            "Milpa\\DTO\\": "src/DTO/",
+            "Milpa\\Enums\\": "src/Enums/",
+            "Milpa\\Attributes\\": "src/Attributes/",
+            "Milpa\\Events\\": "src/Events/",
+            "Milpa\\Services\\": "src/Services/",
+            "Milpa\\Interfaces\\": "src/Interfaces/",
+            "Milpa\\Support\\": "src/Support/"
         }
     },
     "autoload-dev": {

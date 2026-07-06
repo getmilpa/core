@@ -1,10 +1,19 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\ValueObjects\Verification;
+namespace Milpa\ValueObjects\Verification;
 
-use Milpa\app\Enums\VerificationStatus;
+use Milpa\Enums\VerificationStatus;
 
 /**
  * Immutable verdict of a verification: tri-state (passed / failed / waived) + PENDING for
@@ -13,7 +22,7 @@ use Milpa\app\Enums\VerificationStatus;
  * `principal` and `verifier` are opaque identifiers (e.g. "user:42", "human_verify"); the core
  * never resolves them to entities. `missing` is a generic list of unmet requirement keys.
  *
- * @see \Milpa\app\Interfaces\Verification\VerifierInterface
+ * @see \Milpa\Interfaces\Verification\VerifierInterface
  */
 final class VerificationResult
 {

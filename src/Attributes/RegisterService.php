@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\Attributes;
+namespace Milpa\Attributes;
 
 use Attribute;
 
@@ -12,7 +21,7 @@ use Attribute;
  * A service scanner discovers classes carrying this attribute, instantiates
  * each one (honoring {@see $factory} and {@see $dependencies}), and registers
  * the resulting instance through
- * {@see \Milpa\app\Interfaces\Di\DIContainerInterface::registerService()}.
+ * {@see \Milpa\Interfaces\Di\DIContainerInterface::registerService()}.
  * Because a concrete instance is registered, the service is effectively a
  * singleton (one shared instance); an explicit `registerService()` for the same
  * id takes precedence over `resolve()` autowiring.
@@ -24,7 +33,7 @@ use Attribute;
  * )]
  * class ApiAuthMiddleware { ... }
  *
- * @package Milpa\app\Attributes
+ * @package Milpa\Attributes
  */
 #[Attribute(Attribute::TARGET_CLASS)]
 class RegisterService

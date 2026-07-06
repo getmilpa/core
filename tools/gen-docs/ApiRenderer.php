@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
 namespace Milpa\Docs;
@@ -131,8 +140,8 @@ final class ApiRenderer
         }
 
         return '<div class="mui-table-wrap mui-api__params"><table class="mui-table">'
-            . '<caption class="mui-sr-only">' . self::esc('Parámetros de ' . $methodName . '()') . '</caption>'
-            . '<thead><tr><th>Nombre</th><th>Tipo</th><th>Descripción</th></tr></thead>'
+            . '<caption class="mui-sr-only">' . self::esc('Parameters of ' . $methodName . '()') . '</caption>'
+            . '<thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>'
             . '<tbody>' . $rows . '</tbody></table></div>';
     }
 

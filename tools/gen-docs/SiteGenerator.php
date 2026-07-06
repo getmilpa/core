@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
 namespace Milpa\Docs;
@@ -18,12 +27,13 @@ namespace Milpa\Docs;
  */
 final class SiteGenerator
 {
-    private const ROOT_NAMESPACE_PREFIX = 'Milpa\\app\\';
+    private const ROOT_NAMESPACE_PREFIX = 'Milpa\\';
 
     public function __construct(
         private readonly string $srcRoot,
         private readonly string $outDir,
         private readonly string $cssBase,
+        private readonly string $version,
     ) {
     }
 
@@ -44,7 +54,7 @@ final class SiteGenerator
         }
         unset($typesInGroup);
 
-        $shell = new Shell($this->cssBase);
+        $shell = new Shell($this->cssBase, $this->version);
         $renderer = new ApiRenderer();
 
         $navForRoot = $this->buildNav($groups, '');
@@ -104,7 +114,7 @@ final class SiteGenerator
         return $types;
     }
 
-    /** Namespace segment right after `Milpa\app\` (e.g. `ValueObjects`, `Events`), used for grouping/pathing. */
+    /** Namespace segment right after `Milpa\` (e.g. `ValueObjects`, `Events`), used for grouping/pathing. */
     private function groupOf(\ReflectionClass $rc): string
     {
         $ns = $rc->getNamespaceName();
@@ -143,7 +153,7 @@ final class SiteGenerator
      */
     private function renderTypePage(ApiRenderer $renderer, \ReflectionClass $rc): array
     {
-        $mainHtml = $renderer->type($rc);
+        $mainHtml = $this->breadcrumb($rc) . $renderer->type($rc);
         $tocItems = [['#' . self::slugify($rc->getShortName()), $rc->getShortName()]];
 
         foreach ($rc->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
@@ -176,18 +186,58 @@ final class SiteGenerator
      */
     private function buildIndexMain(array $groups): string
     {
-        $html = '<h1 class="mui-api__name">Milpa Core API</h1>';
+        $totalTypes = array_sum(array_map('count', $groups));
+
+        // Hero: what Milpa Core is, in a breath, plus the live contract loop.
+        $html = '<article class="mui-prose docs-gap">'
+            . '<h1 id="milpa-core">Milpa Core <span class="mui-badge mui-badge--accent">v' . self::esc($this->version) . '</span></h1>'
+            . '<p>The framework-agnostic <strong>contracts core</strong> of Milpa — a modular PHP runtime for '
+            . 'applications operable by <strong>both humans and agents</strong>. No ORM, no HTTP client, no kernel: '
+            . 'just the primitives every Milpa module builds on.</p>'
+            . '<p>Modules declare the <em>capabilities</em> they provide and require, expose <em>tools</em> an agent '
+            . 'can invoke, and gate mutating actions behind <em>verification</em>. The contract loop that runs through '
+            . 'the whole system:</p>'
+            . '<p><code>plugin &rarr; capability &rarr; tool &rarr; verification &rarr; event &rarr; result</code></p>'
+            . '</article>';
+
+        // Install snippet, dressed as a design-system code block.
+        $html .= '<div class="mui-code docs-gap"><div class="mui-code__header">'
+            . '<span class="mui-code__file">install</span><span class="mui-code__lang">bash</span></div>'
+            . '<div class="mui-code__body"><pre><code>composer require milpa/core</code></pre></div></div>';
+
+        // API index — grouped by namespace, each group anchored so breadcrumbs can deep-link.
+        $html .= '<article class="mui-prose docs-gap"><h2 id="api-reference">API reference</h2>'
+            . '<p>' . $totalTypes . ' public types across ' . count($groups) . ' namespaces — every symbol carries a '
+            . 'DocBlock, and this reference is generated straight from them.</p></article>';
+
         foreach ($groups as $group => $typesInGroup) {
-            $html .= '<h2 class="mui-api__section">' . self::esc($group) . '</h2><ul class="mui-toc__list">';
+            $html .= '<section class="docs-gap" aria-labelledby="group-' . self::esc($group) . '">'
+                . '<h3 class="mui-api__section" id="group-' . self::esc($group) . '">'
+                . self::esc($group) . ' <span class="mui-badge">' . count($typesInGroup) . '</span></h3>'
+                . '<ul class="mui-toc__list">';
             foreach ($typesInGroup as $rc) {
                 $href = $group . '/' . $rc->getShortName() . '.html';
                 $html .= '<li class="mui-toc__item"><a class="mui-toc__link" href="' . self::esc($href) . '">'
                     . self::esc($rc->getShortName()) . '</a></li>';
             }
-            $html .= '</ul>';
+            $html .= '</ul></section>';
         }
 
         return $html;
+    }
+
+    /** Breadcrumb trail for a type page: Docs / &lt;group&gt; / &lt;TypeName&gt;. */
+    private function breadcrumb(\ReflectionClass $rc): string
+    {
+        $group = $this->groupOf($rc);
+
+        return '<nav class="mui-breadcrumbs docs-gap" aria-label="Breadcrumb">'
+            . '<ol class="mui-breadcrumbs__list">'
+            . '<li class="mui-breadcrumbs__item"><a class="mui-breadcrumbs__link" href="../index.html">Docs</a></li>'
+            . '<li class="mui-breadcrumbs__item"><a class="mui-breadcrumbs__link" href="../index.html#group-'
+            . self::esc($group) . '">' . self::esc($group) . '</a></li>'
+            . '<li class="mui-breadcrumbs__item"><span aria-current="page">' . self::esc($rc->getShortName()) . '</span></li>'
+            . '</ol></nav>';
     }
 
     private function ensureDir(string $dir): void

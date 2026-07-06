@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
+ *
+ * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ *
+ * @license Apache-2.0
+ * @link    https://github.com/getmilpa/core
+ */
+
 declare(strict_types=1);
 
-namespace Milpa\app\Interfaces\Plugin;
+namespace Milpa\Interfaces\Plugin;
 
 /**
  * A single reversible schema/data migration.
@@ -14,12 +23,12 @@ namespace Milpa\app\Interfaces\Plugin;
  * classes directly under the root `migrations/` directory (namespace
  * `Milpa\Migrations`), one class per file, with the class short-name equal
  * to the file's basename (e.g. `migrations/CreateUsersTable.php` →
- * `CreateUsersTable`). {@see \Milpa\app\Commands\MigrateCommand} discovers
+ * `CreateUsersTable`). {@see \Milpa\Commands\MigrateCommand} discovers
  * them via `glob('migrations/*.php')` and applies `sort()` on the file list
  * — i.e. execution order is the ASCII-sort of the class short-name, not a
  * timestamp or semver embedded in the name. This is a *different* migration
  * kind than plugin-versioned migrations (`Version_X_Y_Z.php`, see
- * {@see \Milpa\app\Interfaces\PluginMigrationInterface}), which sort by
+ * {@see \Milpa\Interfaces\PluginMigrationInterface}), which sort by
  * semver instead.
  */
 interface MigrationInterface
