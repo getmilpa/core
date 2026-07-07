@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -29,8 +30,8 @@ final class DocBlock
 {
     /**
      * @param list<array{type:string,name:string,desc:string}> $params
-     * @param array{type:string,desc:string}|null                $return
-     * @param list<array{type:string,desc:string}> $throws
+     * @param array{type:string,desc:string}|null              $return
+     * @param list<array{type:string,desc:string}>             $throws
      */
     private function __construct(
         public readonly string $summary,

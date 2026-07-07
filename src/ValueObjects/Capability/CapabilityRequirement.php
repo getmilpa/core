@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -40,6 +41,7 @@ final class CapabilityRequirement
      * `interface`, defaulting `constraint` to `*`, and normalizing `oneOf` to a list of non-empty strings.
      *
      * @param array<string, mixed> $record
+     *
      * @throws \InvalidArgumentException If `id` or `interface` is empty.
      */
     public static function fromArray(array $record): self

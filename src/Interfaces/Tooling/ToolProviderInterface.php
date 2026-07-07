@@ -6,13 +6,13 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
 declare(strict_types=1);
 
 namespace Milpa\Interfaces\Tooling;
-
 
 /**
  * Interface for plugins that provide AI tools.

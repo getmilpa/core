@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -20,7 +21,7 @@ final class SignatureTest extends TestCase
 {
     public function testRendersTokenizedSignature(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             public function handle(string $path, int $code = 200): bool
             {
                 return $path !== '' && $code > 0;
@@ -39,7 +40,7 @@ final class SignatureTest extends TestCase
 
     public function testClassTypesRenderPlainNotWrappedAsKeywords(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             public function route(\ReflectionClass $rc): \ReflectionMethod
             {
                 return new \ReflectionMethod($rc->getName(), 'route');
@@ -57,7 +58,7 @@ final class SignatureTest extends TestCase
 
     public function testDnfUnionKeepsParensAroundIntersectionMember(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             public function combo((\Countable&\ArrayAccess)|null $items): void
             {
             }

@@ -30,6 +30,30 @@ These run in CI on PHP 8.3 and 8.4 (alongside `composer validate --strict` and a
   interface or capability schema is a `feat!:` / `BREAKING CHANGE:` (bumps MINOR
   while the package is `0.x`, MAJOR once it reaches `1.0`).
 
+## Code style
+
+The whole Milpa family (`milpa/core`, `milpa/http`, `milpa/tool-runtime`) shares one
+coding standard, committed verbatim in every repo as `.php-cs-fixer.dist.php` and
+enforced by CI. In short:
+
+- **[PSR-12](https://www.php-fig.org/psr/psr-12/) base**: 4 spaces (never tabs);
+  opening braces on the **next line** for classes and methods, on the **same line**
+  for control structures; one statement per line.
+- **Family deltas on top of PSR-12**: short array syntax (`[]`), one space around
+  string concatenation (`$a . $b`), fully-multiline method arguments when split,
+  no unused imports, aligned/separated/trimmed PHPDoc tags, trailing commas in
+  multiline constructs.
+
+Check and fix locally before pushing:
+
+```bash
+vendor/bin/php-cs-fixer fix --dry-run --diff   # what CI runs
+vendor/bin/php-cs-fixer fix                    # apply
+```
+
+Do not tweak `.php-cs-fixer.dist.php` in one package alone — the standard changes
+in lockstep across the family or not at all.
+
 ## Pull requests
 
 Keep PRs focused, add tests for behavior changes, and make sure the four commands

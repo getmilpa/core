@@ -6,6 +6,7 @@
 [![Packagist](https://img.shields.io/packagist/v/milpa/core.svg)](https://packagist.org/packages/milpa/core)
 [![PHP](https://img.shields.io/badge/php-%E2%89%A5%208.3-777bb4.svg)](https://www.php.net/)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-API%20reference-blue.svg)](https://getmilpa.github.io/core/)
 
 `milpa/core` is the dependency-light heart of the framework: the attributes, events,
 value objects, enums, interfaces, and the verification seam that every Milpa module

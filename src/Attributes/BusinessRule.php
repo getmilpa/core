@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -40,11 +41,11 @@ class BusinessRule
     public readonly int $priorityValue;
 
     /**
-     * @param string                    $event       Event to subscribe to (default: 'pre.operation')
-     * @param array<int, class-string>  $entities    Entity classes this rule applies to
-     * @param int|ListenerPriority      $priority    Execution priority
-     * @param string|null               $description Human-readable description of the rule
-     * @param bool                      $enabled     Whether the rule is enabled
+     * @param string                   $event       Event to subscribe to (default: 'pre.operation')
+     * @param array<int, class-string> $entities    Entity classes this rule applies to
+     * @param int|ListenerPriority     $priority    Execution priority
+     * @param string|null              $description Human-readable description of the rule
+     * @param bool                     $enabled     Whether the rule is enabled
      */
     public function __construct(
         public readonly string $event = 'pre.operation',

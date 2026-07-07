@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -24,8 +25,8 @@ interface AuditLoggerInterface
     /**
      * Log an audit event.
      *
-     * @param string $entityId ID de la entidad afectada (opaque string/UUID identity).
-     * @param string|null $actorUserId ID del actor que realizo la accion (opaque string/UUID identity).
+     * @param string                    $entityId    ID de la entidad afectada (opaque string/UUID identity).
+     * @param string|null               $actorUserId ID del actor que realizo la accion (opaque string/UUID identity).
      * @param array<string, mixed>|null $oldValues
      * @param array<string, mixed>|null $newValues
      * @param array<string, mixed>|null $metadata

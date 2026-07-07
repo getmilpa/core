@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -25,7 +26,7 @@ final class UuidGeneratorTest extends TestCase
 {
     private function generate(): string
     {
-        $host = new class {
+        $host = new class () {
             use UuidGenerator;
 
             public function make(): string

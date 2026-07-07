@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -136,7 +137,7 @@ final class DIContainerContractTest extends TestCase
      */
     private function makeContainer(): DIContainerInterface
     {
-        return new class implements DIContainerInterface {
+        return new class () implements DIContainerInterface {
             /** @var array<string, string|object> */
             private array $services = [];
 

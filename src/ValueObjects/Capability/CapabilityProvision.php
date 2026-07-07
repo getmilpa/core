@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -42,6 +43,7 @@ final class CapabilityProvision
      * `interface`, and `contractVersion` (must be valid semver).
      *
      * @param array<string, mixed> $record
+     *
      * @throws \InvalidArgumentException If `id`/`interface` are empty or `contractVersion` is not valid semver.
      */
     public static function fromArray(array $record): self

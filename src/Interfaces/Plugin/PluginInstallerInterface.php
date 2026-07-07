@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -27,7 +28,7 @@ interface PluginInstallerInterface
      *
      * @param string $source "owner/repo", "owner/repo:^2.0", or full GitHub URL
      *
-     * @throws \Milpa\Exceptions\Plugin\PluginInstallException If the plugin fails to install.
+     * @throws \Milpa\Exceptions\Plugin\PluginInstallException    If the plugin fails to install.
      * @throws \Milpa\Exceptions\Plugin\PluginDependencyException If a required dependency is unmet.
      */
     public function require(string $source): PluginInstallResult;

@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -17,7 +18,7 @@ namespace Milpa\ValueObjects\Tooling;
  * Typed replacement for the untyped `array $options` previously accepted by
  * {@see \Milpa\Interfaces\Tooling\ToolRegistryInterface::register()}.
  *
- * The concrete tool-runtime {@see \Milpa\Plugins\MilpaToolRuntimePlugin\ToolDefinition} only
+ * The concrete tool-runtime {@see \Milpa\ToolRuntime\ToolDefinition} only
  * understands `scopes|mutating|requiresConfirmation|timeout|clamps|version|outputSchema`.
  * Passing an unknown key (e.g. `category`) in the old raw-array API silently vanished —
  * {@see ToolDefinition} has no such property, so it was dropped with no error.

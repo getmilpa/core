@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -36,6 +37,7 @@ final class CapabilitySuggestion
      * `interface`, defaulting `constraint` to `*`, and normalizing an empty `fallback` to null.
      *
      * @param array<string, mixed> $record
+     *
      * @throws \InvalidArgumentException If `id` or `interface` is empty.
      */
     public static function fromArray(array $record): self

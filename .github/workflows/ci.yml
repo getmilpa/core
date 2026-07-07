@@ -35,6 +35,11 @@ jobs:
       - name: PHP syntax
         run: find src tests tools -name '*.php' -print0 | xargs -0 -n1 php -l >/dev/null
 
+      - name: Code style (family standard, php-cs-fixer dry-run)
+        env:
+          PHP_CS_FIXER_IGNORE_ENV: 1
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
       - name: PHPStan
         run: vendor/bin/phpstan analyse src --no-progress
 

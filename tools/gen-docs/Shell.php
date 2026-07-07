@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -73,6 +74,8 @@ final class Shell
             . '.docs-footer { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-2) var(--space-3); max-width:90rem; margin-inline:auto; padding:var(--space-6) clamp(var(--space-4),3vw,var(--space-8)); border-block-start:1px solid var(--border-subtle); color:var(--text-muted); font-size:var(--text-sm); }'
             . '.docs-footer__tagline { margin:0; font-family:var(--font-mono); font-size:var(--text-xs); }'
             . '.docs-footer__credit { margin:0; font-size:var(--text-xs); }'
+            . '.docs-footer__credit a { color:inherit; text-decoration:underline; text-underline-offset:2px; text-decoration-color:var(--border-strong); }'
+            . '.docs-footer__credit a:hover { color:var(--text); text-decoration-color:currentColor; }'
             . '.docs-footer__legal { margin:0; margin-inline-start:auto; font-size:var(--text-xs); }'
             . '.docs-gap { margin-block-end:var(--space-6); }'
             // Subtle, occasional logo life: the plot squares twinkle once per ~16s cycle,

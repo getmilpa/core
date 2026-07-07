@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -30,7 +31,7 @@ interface ToolRegistryInterface
      *
      * @param array<string, mixed> $inputSchema JSON-schema-like input definition
      * @param callable             $callback    Tool handler
-     * @param ?ToolOptions          $options     scopes|mutating|requiresConfirmation|timeout|clamps|version|outputSchema
+     * @param ?ToolOptions         $options     scopes|mutating|requiresConfirmation|timeout|clamps|version|outputSchema
      */
     public function register(
         string $name,

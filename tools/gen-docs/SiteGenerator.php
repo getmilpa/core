@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -84,7 +85,7 @@ final class SiteGenerator
 
     /**
      * @return array<string, \ReflectionClass<object>> map of FQCN => reflection, discovered the
-     *     same way `tools/validate-docblocks.php` does (file-scan + anchored regex + reflection).
+     *                                                 same way `tools/validate-docblocks.php` does (file-scan + anchored regex + reflection).
      */
     private function discoverTypes(): array
     {

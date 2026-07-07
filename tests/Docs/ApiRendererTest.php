@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -21,11 +22,14 @@ final class ApiRendererTest extends TestCase
 {
     public function testMethodEntryHasContractStructure(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             /**
              * Dispatches the request to the matching controller.
+             *
              * @param string $path the request path
+             *
              * @return bool whether it matched
+             *
              * @throws \RuntimeException on failure
              */
             public function handle(string $path): bool
@@ -48,9 +52,10 @@ final class ApiRendererTest extends TestCase
 
     public function testDeprecatedRendersBadgeAndNote(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             /**
              * Old renderer.
+             *
              * @deprecated use stream() instead
              */
             public function render(): string
@@ -65,9 +70,10 @@ final class ApiRendererTest extends TestCase
 
     public function testDeprecatedBareIntegerIsNotTreatedAsVersion(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             /**
              * Old renderer.
+             *
              * @deprecated 10 years, use newMethod() instead
              */
             public function render(): string
@@ -83,10 +89,12 @@ final class ApiRendererTest extends TestCase
 
     public function testReturnAndThrowsWithoutProseOmitEmptyParagraphs(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             /**
              * Old renderer.
+             *
              * @return bool
+             *
              * @throws \RuntimeException
              */
             public function render(): bool
@@ -104,7 +112,7 @@ final class ApiRendererTest extends TestCase
 
     public function testParamsTableIsBuiltFromReflectionWithoutAnyParamTags(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             public function route(string $path, int $code): void
             {
             }
@@ -120,9 +128,10 @@ final class ApiRendererTest extends TestCase
 
     public function testParamsTableShowsBothParamsWithPartialDocCoverage(): void
     {
-        $fixture = new class {
+        $fixture = new class () {
             /**
              * Does a thing.
+             *
              * @param string $path the request path
              */
             public function route(string $path, int $code): void
@@ -141,10 +150,11 @@ final class ApiRendererTest extends TestCase
     {
         /**
          * A value object representing a semantic version.
+         *
          * @since 1.2
          * @deprecated 2.0 use NewVersion instead
          */
-        $fixture = new class {
+        $fixture = new class () {
         };
 
         $html = (new ApiRenderer())->type(new \ReflectionClass($fixture));

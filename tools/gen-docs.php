@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -32,11 +33,11 @@ $out = is_string($opts['out'] ?? null) ? $opts['out'] : 'build/docs';
 $cssBase = is_string($opts['css-base'] ?? null) ? $opts['css-base'] : 'https://cdn.jsdelivr.net/npm/@milpa/design@0.8.0';
 
 // Version shown in the docs chrome (topbar badge, title, footer). Prefer an
-// explicit --version; otherwise read the release-please manifest at the repo
-// root (present in the published repo); fall back to "dev" for local builds.
+// explicit --version; otherwise read the release-please manifest (it lives
+// under .github/ in the published repo); fall back to "dev" for local builds.
 $version = is_string($opts['version'] ?? null) ? $opts['version'] : null;
 if ($version === null) {
-    $manifest = dirname(__DIR__) . '/.release-please-manifest.json';
+    $manifest = dirname(__DIR__) . '/.github/.release-please-manifest.json';
     $data = is_file($manifest) ? json_decode((string) file_get_contents($manifest), true) : null;
     $version = is_array($data) && is_string($data['.'] ?? null) ? $data['.'] : 'dev';
 }

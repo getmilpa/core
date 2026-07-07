@@ -6,6 +6,7 @@
  * (c) TeamX — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
+ *
  * @link    https://github.com/getmilpa/core
  */
 
@@ -26,7 +27,7 @@ final class PluginInstallException extends \RuntimeException implements MilpaExc
      * Builds the exception for a plugin that failed to install from a source.
      *
      * @param string $source Remote source the plugin was installed from
-     *                        (e.g. "owner/repo", "owner/repo:^2.0", or a GitHub URL)
+     *                       (e.g. "owner/repo", "owner/repo:^2.0", or a GitHub URL)
      * @param string $reason Human-readable reason for the failure
      */
     public static function forSource(string $source, string $reason): self
