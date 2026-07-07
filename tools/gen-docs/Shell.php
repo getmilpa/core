@@ -129,7 +129,7 @@ final class Shell
         return '<footer class="docs-footer">'
             . '<svg class="docs-wordmark" viewBox="0 0 2406.90 900.00" role="img" aria-label="milpa"><use href="#wm-milpa"/></svg>'
             . '<p class="docs-footer__tagline">Siembra módulos, cosecha aplicaciones.</p>'
-            . '<p class="docs-footer__credit">Developed by <a href="https://teamx.agency">TeamX Agency</a></p>'
+            . '<p class="docs-footer__credit">Developed by <a href="https://teamx.agency/?utm_source=milpa-docs&utm_medium=footer&utm_campaign=milpa&utm_content=core">TeamX Agency</a></p>'
             . '<p class="docs-footer__legal">© 2026 Milpa · Apache-2.0 · docs built from v' . self::esc($this->version) . '</p>'
             . '</footer>';
     }
