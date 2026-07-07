@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/getmilpa/core/compare/v0.2.0...v0.2.1) (2026-07-07)
+
+
+### Bug Fixes
+
+* **docs:** footer credit color via design tokens + version detection on the docs site ([1dce204](https://github.com/getmilpa/core/commit/1dce2049ecc73e1645eda5a037316ed5ae24aa4a))
+
 ## 0.2.0 (2026-07-06)
 
 
