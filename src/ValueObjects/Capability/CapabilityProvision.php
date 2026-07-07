@@ -25,9 +25,18 @@ use Milpa\ValueObjects\SemanticVersion;
  * Also accepts the legacy bare-FQCN string form via {@see fromInterface()} so
  * legacy manifests (`contracts.provides = ["Foo\\BarInterface"]`) keep working
  * until the capability records are fully adopted.
+ *
+ * The primary constructor validates exactly like {@see fromArray()} does: `id`
+ * and `interface` must be non-empty and `contractVersion` must be valid semver.
+ * There is no "trusted, pre-validated" construction path — hand-building a
+ * record (e.g. `new CapabilityProvision(...)` from reflected `#[PluginMetadata]`
+ * data) is validated identically to parsing one from a manifest.
  */
 final class CapabilityProvision
 {
+    /**
+     * @throws \InvalidArgumentException If `id`/`interface` are empty or `contractVersion` is not valid semver.
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $interface,
@@ -36,11 +45,25 @@ final class CapabilityProvision
         public readonly int $priority = 0,
         public readonly bool $exclusive = false,
     ) {
+        if (trim($this->id) === '') {
+            throw new \InvalidArgumentException('Capability `provides` record requires a non-empty "id".');
+        }
+
+        if (trim($this->interface) === '') {
+            throw new \InvalidArgumentException(
+                "Capability `provides` record \"{$this->id}\" requires a non-empty \"interface\"."
+            );
+        }
+
+        // Throws \InvalidArgumentException when not valid semver.
+        SemanticVersion::parse($this->contractVersion);
     }
 
     /**
-     * Build a provision record from a decoded `provides` manifest entry, validating `id`,
-     * `interface`, and `contractVersion` (must be valid semver).
+     * Build a provision record from a decoded `provides` manifest entry. Coerces raw
+     * (possibly untyped) array values to their expected shape; validation of the
+     * result (`id`/`interface` non-empty, `contractVersion` valid semver) happens in
+     * the constructor, not here.
      *
      * @param array<string, mixed> $record
      *
@@ -49,20 +72,8 @@ final class CapabilityProvision
     public static function fromArray(array $record): self
     {
         $id = trim((string) ($record['id'] ?? ''));
-        if ($id === '') {
-            throw new \InvalidArgumentException('Capability `provides` record requires a non-empty "id".');
-        }
-
         $interface = trim((string) ($record['interface'] ?? ''));
-        if ($interface === '') {
-            throw new \InvalidArgumentException(
-                "Capability `provides` record \"{$id}\" requires a non-empty \"interface\"."
-            );
-        }
-
-        // Throws \InvalidArgumentException when not valid semver.
         $contractVersion = trim((string) ($record['contractVersion'] ?? ''));
-        SemanticVersion::parse($contractVersion);
 
         $service = isset($record['service']) && (string) $record['service'] !== ''
             ? (string) $record['service']

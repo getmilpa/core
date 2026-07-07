@@ -20,6 +20,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Dispatched when a verification resolves as not satisfied (failed).
+ *
+ * Dispatch payload shape: a verifier dispatching this through a
+ * {@see \Milpa\Interfaces\Event\MilpaEventDispatcherInterface} MUST use the
+ * event name `verification.rejected` with a payload of exactly
+ * `['event' => VerificationRejectedEvent $event]` — the event OBJECT keyed
+ * under `'event'`, not a flattened array of the request/result fields. A
+ * listener reaches the request/result via `$payload['event']->getRequest()`
+ * / `$payload['event']->getResult()`.
  */
 class VerificationRejectedEvent extends Event
 {

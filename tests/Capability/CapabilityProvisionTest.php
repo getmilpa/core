@@ -110,4 +110,36 @@ final class CapabilityProvisionTest extends TestCase
             'contractVersion' => 'not-a-semver',
         ]);
     }
+
+    /**
+     * The primary constructor validates exactly like fromArray() does — hand-building
+     * a VO (as consumers historically did, see the capability-graph checker) can no
+     * longer silently produce an invalid record.
+     */
+    public function testConstructorRejectsEmptyId(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilityProvision(id: '', interface: 'App\\Contracts\\Thing', contractVersion: '1.0.0');
+    }
+
+    public function testConstructorRejectsEmptyInterface(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilityProvision(id: 'x.y', interface: '', contractVersion: '1.0.0');
+    }
+
+    public function testConstructorRejectsInvalidContractVersion(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilityProvision(id: 'x.y', interface: 'App\\Contracts\\Thing', contractVersion: 'not-a-semver');
+    }
+
+    public function testConstructorAcceptsAValidRecord(): void
+    {
+        $vo = new CapabilityProvision(id: 'x.y', interface: 'App\\Contracts\\Thing', contractVersion: '1.0.0');
+
+        $this->assertSame('x.y', $vo->id);
+        $this->assertSame('App\\Contracts\\Thing', $vo->interface);
+        $this->assertSame('1.0.0', $vo->contractVersion);
+    }
 }

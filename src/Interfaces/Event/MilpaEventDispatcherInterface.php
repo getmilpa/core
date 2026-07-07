@@ -30,9 +30,18 @@ interface MilpaEventDispatcherInterface
      * NOT abort the dispatch or prevent later listeners from running.
      * (An implementation that needs fail-fast semantics must document the deviation.)
      *
+     * `$async` semantics: `true` requests deferred execution via a queue. An
+     * implementation with a queue wired MUST honor the request (dispatch via
+     * the queue, not inline). An implementation with no queue configured MAY
+     * degrade to synchronous dispatch as a conformant fallback — that is not
+     * a deviation needing a special flag — but MUST document that it does so,
+     * the same way the error-isolation paragraph above documents fail-fast as
+     * a deviation. An implementation MUST NOT silently drop the event because
+     * no queue is wired.
+     *
      * @param string               $eventName Event name (e.g., 'user.registered', 'order.shipped')
      * @param array<string, mixed> $payload   Data to pass to handlers
-     * @param bool                 $async     If true, dispatch via queue for deferred execution
+     * @param bool                 $async     If true, requests deferred (queued) execution — see the `$async` semantics paragraph above for the no-queue fallback contract
      *
      * @return void
      */

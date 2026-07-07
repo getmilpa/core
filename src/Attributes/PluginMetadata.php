@@ -27,6 +27,23 @@ use Attribute;
 class PluginMetadata
 {
     /**
+     * @param string              $type     The plugin's kind, by what surface it exposes. `$type` is a
+     *                                      plain `string`, not a backed enum — deliberately: the four
+     *                                      values below are the observed, sanctioned vocabulary (every
+     *                                      plugin across the Milpa ecosystem uses one of them, and the
+     *                                      scaffolding CLI only ever generates one of them), but making
+     *                                      it a native enum type would be a breaking change for every
+     *                                      existing `#[PluginMetadata(type: '...')]` call site the
+     *                                      moment a host application updates core, for a check this
+     *                                      docblock (plus a lint/CI rule, if a host wants one) already
+     *                                      covers.
+     *                                      - `'Web'` — exposes HTTP-facing surface (controllers/routes).
+     *                                      - `'CLI'` — exposes only CLI commands, no HTTP surface.
+     *                                      - `'Service'` — exposes only services/tools consumed by other
+     *                                      plugins or the runtime, no direct HTTP or CLI surface of its
+     *                                      own.
+     *                                      - `'Mixed'` — exposes more than one of the above (e.g. both
+     *                                      HTTP routes and CLI commands).
      * @param array<class-string> $provides Interfaces/services this plugin provides
      * @param array<class-string> $requires Required interfaces/services (hard dependency)
      * @param array<class-string> $suggests Optional interfaces/services (soft dependency)

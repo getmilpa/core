@@ -22,11 +22,18 @@ namespace Milpa\ValueObjects\Capability;
  *
  * `oneOf` optionally lists provider capability ids any of which satisfies the
  * requirement. Legacy bare-FQCN declarations are accepted via {@see fromInterface()}.
+ *
+ * The primary constructor validates exactly like {@see fromArray()} does: `id`
+ * and `interface` must be non-empty. There is no "trusted, pre-validated"
+ * construction path — hand-building a record is validated identically to
+ * parsing one from a manifest.
  */
 final class CapabilityRequirement
 {
     /**
      * @param list<string> $oneOf
+     *
+     * @throws \InvalidArgumentException If `id` or `interface` is empty.
      */
     public function __construct(
         public readonly string $id,
@@ -34,11 +41,22 @@ final class CapabilityRequirement
         public readonly string $constraint = '*',
         public readonly array $oneOf = [],
     ) {
+        if (trim($this->id) === '') {
+            throw new \InvalidArgumentException('Capability `requires` record requires a non-empty "id".');
+        }
+
+        if (trim($this->interface) === '') {
+            throw new \InvalidArgumentException(
+                "Capability `requires` record \"{$this->id}\" requires a non-empty \"interface\"."
+            );
+        }
     }
 
     /**
-     * Build a requirement record from a decoded `requires` manifest entry, validating `id` and
-     * `interface`, defaulting `constraint` to `*`, and normalizing `oneOf` to a list of non-empty strings.
+     * Build a requirement record from a decoded `requires` manifest entry. Coerces raw
+     * (possibly untyped) array values to their expected shape — defaulting `constraint`
+     * to `*` and normalizing `oneOf` to a list of non-empty strings; validation of the
+     * result (`id`/`interface` non-empty) happens in the constructor, not here.
      *
      * @param array<string, mixed> $record
      *
@@ -47,16 +65,7 @@ final class CapabilityRequirement
     public static function fromArray(array $record): self
     {
         $id = trim((string) ($record['id'] ?? ''));
-        if ($id === '') {
-            throw new \InvalidArgumentException('Capability `requires` record requires a non-empty "id".');
-        }
-
         $interface = trim((string) ($record['interface'] ?? ''));
-        if ($interface === '') {
-            throw new \InvalidArgumentException(
-                "Capability `requires` record \"{$id}\" requires a non-empty \"interface\"."
-            );
-        }
 
         $constraint = trim((string) ($record['constraint'] ?? ''));
         if ($constraint === '') {

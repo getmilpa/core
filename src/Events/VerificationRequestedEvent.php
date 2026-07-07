@@ -20,6 +20,13 @@ use Milpa\ValueObjects\Verification\VerificationRequest;
 /**
  * Dispatched when a verification is requested but not yet resolved (async human/agent verify).
  * Listeners can route it to an approver, open a gate passage, etc.
+ *
+ * Dispatch payload shape: a verifier dispatching this through a
+ * {@see \Milpa\Interfaces\Event\MilpaEventDispatcherInterface} MUST use the
+ * event name `verification.requested` with a payload of exactly
+ * `['event' => VerificationRequestedEvent $event]` — the event OBJECT keyed
+ * under `'event'`, not a flattened array of the request's fields. A listener
+ * reaches the request via `$payload['event']->getRequest()`.
  */
 class VerificationRequestedEvent extends Event
 {

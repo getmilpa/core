@@ -14,6 +14,9 @@ declare(strict_types=1);
 
 namespace Milpa\Interfaces\Verification;
 
+use Milpa\Events\VerificationGrantedEvent;
+use Milpa\Events\VerificationRejectedEvent;
+use Milpa\Events\VerificationRequestedEvent;
 use Milpa\ValueObjects\Verification\VerificationContext;
 use Milpa\ValueObjects\Verification\VerificationRequest;
 use Milpa\ValueObjects\Verification\VerificationResult;
@@ -25,7 +28,11 @@ use Milpa\ValueObjects\Verification\VerificationResult;
  *
  * Implementations MUST NOT depend on Doctrine or resolve principals to entities — the core stays
  * framework-agnostic (ADR-001). Async verifiers return a PENDING result and resolve later via the
- * verification events.
+ * verification events: {@see VerificationRequestedEvent} (`verification.requested`),
+ * {@see VerificationGrantedEvent} (`verification.granted`), and
+ * {@see VerificationRejectedEvent} (`verification.rejected`). Each is dispatched with a payload
+ * of exactly `['event' => $event]` — the event object itself, not its fields flattened into the
+ * payload array (see each event class's own docblock for the exact contract).
  *
  * `human_verify` is one such verifier, exposed as a tool through the ToolRegistry.
  */

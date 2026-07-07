@@ -21,10 +21,24 @@ use Psr\Container\NotFoundExceptionInterface;
 /**
  * Dependency Injection Container Interface.
  *
- * Provides service registration, retrieval, and auto-wiring capabilities.
+ * Provides service registration and retrieval, plus an explicit auto-wiring
+ * seam ({@see resolve()}) that implementations opt into.
  *
  * Extends the PSR-11 `ContainerInterface` so implementations are usable
  * anywhere a standard PSR-11 container is expected.
+ *
+ * **Autowiring is a MAY, not a MUST.** {@see get()} and {@see has()} do not
+ * themselves promise auto-resolution of unregistered classes — a minimal,
+ * spec-conformant implementation may simply throw from `get()` and return
+ * `false` from `has()` for any identifier that was never explicitly
+ * registered via {@see registerService()}. An implementation MAY choose to
+ * additionally auto-resolve unregistered but existing classes (typically by
+ * delegating internally to {@see resolve()}) — that is a capability of the
+ * implementation, not a guarantee of this interface. Callers that need
+ * guaranteed autowiring on `get()`/`has()` MUST depend on that documented
+ * capability of their chosen implementation, not on this interface alone.
+ * {@see resolve()} remains the one method whose contract IS auto-wiring:
+ * calling it always attempts constructor-dependency resolution.
  */
 interface DIContainerInterface extends ContainerInterface
 {
@@ -53,21 +67,31 @@ interface DIContainerInterface extends ContainerInterface
     /**
      * Get a service from the container.
      *
-     * If the service is not registered but the class exists,
-     * it will be auto-resolved and registered as a singleton.
+     * Guaranteed to resolve identifiers registered via {@see registerService()}.
+     * For an identifier that was never registered but names an existing class,
+     * an implementation MAY auto-resolve and register it as a singleton (see
+     * the class docblock) — a minimal implementation MAY instead throw
+     * {@see NotFoundExceptionInterface} for any unregistered identifier.
+     * Consult the implementation's own documentation for which behavior it
+     * guarantees.
      *
      * @param string $id Service identifier (usually FQCN)
      *
      * @return mixed Service instance
      *
-     * @throws NotFoundExceptionInterface                 No entry was found for this identifier.
+     * @throws NotFoundExceptionInterface                 No entry was found for this identifier (and, if the implementation does not auto-resolve, no entry ever will be).
      * @throws \Psr\Container\ContainerExceptionInterface Auto-resolution of the entry failed.
      */
     public function get(string $id): mixed;
 
     /**
-     * Checks whether an identifier is resolvable: either already registered,
-     * or an existing class that can be auto-wired.
+     * Checks whether an identifier is resolvable.
+     *
+     * Guaranteed `true` for identifiers registered via {@see registerService()}.
+     * For an unregistered identifier, an implementation MAY additionally
+     * return `true` when the identifier names a class it is willing to
+     * auto-wire (see the class docblock) — a minimal implementation MAY
+     * instead return `false` for anything not explicitly registered.
      */
     public function has(string $id): bool;
 
@@ -76,6 +100,10 @@ interface DIContainerInterface extends ContainerInterface
      *
      * Instantiates the class resolving constructor dependencies from the container.
      * If $singleton is true, registers the instance for future use.
+     *
+     * Unlike {@see get()}/{@see has()}, autowiring is this method's actual
+     * contract: every conformant implementation MUST attempt constructor
+     * resolution here, regardless of what it guarantees for `get()`/`has()`.
      *
      * @param string $className Fully qualified class name
      * @param bool   $singleton Register as singleton (default: true)

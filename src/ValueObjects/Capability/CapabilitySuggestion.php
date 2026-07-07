@@ -21,20 +21,39 @@ namespace Milpa\ValueObjects\Capability;
  * graceful-degradation path (e.g. "noop" / a null-object strategy).
  *
  * Legacy bare-FQCN declarations are accepted via {@see fromInterface()}.
+ *
+ * The primary constructor validates exactly like {@see fromArray()} does: `id`
+ * and `interface` must be non-empty. There is no "trusted, pre-validated"
+ * construction path — hand-building a record is validated identically to
+ * parsing one from a manifest.
  */
 final class CapabilitySuggestion
 {
+    /**
+     * @throws \InvalidArgumentException If `id` or `interface` is empty.
+     */
     public function __construct(
         public readonly string $id,
         public readonly string $interface,
         public readonly string $constraint = '*',
         public readonly ?string $fallback = null,
     ) {
+        if (trim($this->id) === '') {
+            throw new \InvalidArgumentException('Capability `suggests` record requires a non-empty "id".');
+        }
+
+        if (trim($this->interface) === '') {
+            throw new \InvalidArgumentException(
+                "Capability `suggests` record \"{$this->id}\" requires a non-empty \"interface\"."
+            );
+        }
     }
 
     /**
-     * Build a suggestion record from a decoded `suggests` manifest entry, validating `id` and
-     * `interface`, defaulting `constraint` to `*`, and normalizing an empty `fallback` to null.
+     * Build a suggestion record from a decoded `suggests` manifest entry. Coerces raw
+     * (possibly untyped) array values to their expected shape — defaulting `constraint`
+     * to `*` and normalizing an empty `fallback` to null; validation of the result
+     * (`id`/`interface` non-empty) happens in the constructor, not here.
      *
      * @param array<string, mixed> $record
      *
@@ -43,16 +62,7 @@ final class CapabilitySuggestion
     public static function fromArray(array $record): self
     {
         $id = trim((string) ($record['id'] ?? ''));
-        if ($id === '') {
-            throw new \InvalidArgumentException('Capability `suggests` record requires a non-empty "id".');
-        }
-
         $interface = trim((string) ($record['interface'] ?? ''));
-        if ($interface === '') {
-            throw new \InvalidArgumentException(
-                "Capability `suggests` record \"{$id}\" requires a non-empty \"interface\"."
-            );
-        }
 
         $constraint = trim((string) ($record['constraint'] ?? ''));
         if ($constraint === '') {

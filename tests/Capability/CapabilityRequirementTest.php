@@ -83,4 +83,28 @@ final class CapabilityRequirementTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         CapabilityRequirement::fromArray(['id' => 'a']);
     }
+
+    /**
+     * The primary constructor validates exactly like fromArray() does — hand-building
+     * a VO can no longer silently produce an invalid record.
+     */
+    public function testConstructorRejectsEmptyId(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilityRequirement(id: '', interface: 'App\\Contracts\\Thing');
+    }
+
+    public function testConstructorRejectsEmptyInterface(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilityRequirement(id: 'a', interface: '');
+    }
+
+    public function testConstructorAcceptsAValidRecord(): void
+    {
+        $vo = new CapabilityRequirement(id: 'a', interface: 'App\\Contracts\\Thing');
+
+        $this->assertSame('a', $vo->id);
+        $this->assertSame('App\\Contracts\\Thing', $vo->interface);
+    }
 }

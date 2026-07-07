@@ -84,4 +84,28 @@ final class CapabilitySuggestionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         CapabilitySuggestion::fromArray(['id' => 'a']);
     }
+
+    /**
+     * The primary constructor validates exactly like fromArray() does — hand-building
+     * a VO can no longer silently produce an invalid record.
+     */
+    public function testConstructorRejectsEmptyId(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilitySuggestion(id: '', interface: 'App\\Contracts\\Thing');
+    }
+
+    public function testConstructorRejectsEmptyInterface(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new CapabilitySuggestion(id: 'a', interface: '');
+    }
+
+    public function testConstructorAcceptsAValidRecord(): void
+    {
+        $vo = new CapabilitySuggestion(id: 'a', interface: 'App\\Contracts\\Thing');
+
+        $this->assertSame('a', $vo->id);
+        $this->assertSame('App\\Contracts\\Thing', $vo->interface);
+    }
 }
