@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/getmilpa/core/compare/v0.2.1...v0.3.0) (2026-07-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* capability graph checker + honest contracts (autowiring MAY, async semantics, validating VOs)
+
+### Features
+
+* capability graph checker + honest contracts (autowiring MAY, async semantics, validating VOs) ([03ab027](https://github.com/getmilpa/core/commit/03ab027a0aed711465adf75edfd431d78156281d))
+
 ## [0.2.1](https://github.com/getmilpa/core/compare/v0.2.0...v0.2.1) (2026-07-07)
 
 
