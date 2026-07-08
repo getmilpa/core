@@ -55,6 +55,36 @@ final class VerificationRequestContextTest extends TestCase
         new VerificationRequest('   ');
     }
 
+    public function testRequestAcceptsNullSubjectDirectly(): void
+    {
+        $r = new VerificationRequest(null, id: 'req-1');
+
+        $this->assertNull($r->subject);
+        $this->assertSame('req-1', $r->id);
+    }
+
+    public function testForResolutionBuildsARequestWithNullSubjectKeyedById(): void
+    {
+        $r = VerificationRequest::forResolution('req-123');
+
+        $this->assertNull($r->subject);
+        $this->assertSame('req-123', $r->id);
+        $this->assertSame(ApprovalPolicy::SINGLE, $r->policy);
+    }
+
+    public function testForResolutionAcceptsAnExplicitPolicy(): void
+    {
+        $r = VerificationRequest::forResolution('req-123', ApprovalPolicy::DUAL);
+
+        $this->assertSame(ApprovalPolicy::DUAL, $r->policy);
+    }
+
+    public function testForResolutionRejectsEmptyId(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        VerificationRequest::forResolution('   ');
+    }
+
     public function testRequestIdDefaultsToNullAndIsBcFriendly(): void
     {
         $r = new VerificationRequest('gate:proposal.sent');

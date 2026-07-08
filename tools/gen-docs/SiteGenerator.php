@@ -25,16 +25,18 @@ namespace Milpa\Docs;
  * under `$srcRoot`, pull the namespace + type name via regex, and confirm it
  * via `class_exists()`/`interface_exists()`/`trait_exists()`/`enum_exists()`
  * so only autoloadable, declared types are reflected.
+ *
+ * Branding (brand name, grouping namespace prefix, install snippet, hero prose, …) comes from
+ * {@see SiteConfig}; omit it to generate today's core-branded site unchanged.
  */
 final class SiteGenerator
 {
-    private const ROOT_NAMESPACE_PREFIX = 'Milpa\\';
-
     public function __construct(
         private readonly string $srcRoot,
         private readonly string $outDir,
         private readonly string $cssBase,
         private readonly string $version,
+        private readonly SiteConfig $config = new SiteConfig(),
     ) {
     }
 
@@ -55,7 +57,7 @@ final class SiteGenerator
         }
         unset($typesInGroup);
 
-        $shell = new Shell($this->cssBase, $this->version);
+        $shell = new Shell($this->cssBase, $this->version, $this->config);
         $renderer = new ApiRenderer();
 
         $navForRoot = $this->buildNav($groups, '');
@@ -76,7 +78,7 @@ final class SiteGenerator
             }
         }
 
-        $indexPage = $shell->page('Milpa Core API', $navForRoot, $this->buildIndexMain($groups), '');
+        $indexPage = $shell->page($this->config->brand . ' API', $navForRoot, $this->buildIndexMain($groups), '');
         file_put_contents($this->outDir . '/index.html', $indexPage);
         $count++;
 
@@ -115,12 +117,18 @@ final class SiteGenerator
         return $types;
     }
 
-    /** Namespace segment right after `Milpa\` (e.g. `ValueObjects`, `Events`), used for grouping/pathing. */
+    /**
+     * Namespace segment right after {@see SiteConfig::$nsPrefix} (e.g. `ValueObjects`,
+     * `Events`), used for grouping/pathing. Types outside the prefix — or, with a `$nsPrefix`
+     * that matches nothing in `$srcRoot`, every type — fall into a single "Core" group.
+     *
+     * @param \ReflectionClass<object> $rc
+     */
     private function groupOf(\ReflectionClass $rc): string
     {
         $ns = $rc->getNamespaceName();
-        if (str_starts_with($ns, self::ROOT_NAMESPACE_PREFIX)) {
-            $tail = substr($ns, strlen(self::ROOT_NAMESPACE_PREFIX));
+        if (str_starts_with($ns, $this->config->nsPrefix)) {
+            $tail = substr($ns, strlen($this->config->nsPrefix));
             $segment = explode('\\', $tail, 2)[0];
             if ($segment !== '') {
                 return $segment;
@@ -150,6 +158,8 @@ final class SiteGenerator
     }
 
     /**
+     * @param \ReflectionClass<object> $rc
+     *
      * @return array{0: string, 1: string} [mainHtml, tocHtml]
      */
     private function renderTypePage(ApiRenderer $renderer, \ReflectionClass $rc): array
@@ -189,12 +199,11 @@ final class SiteGenerator
     {
         $totalTypes = array_sum(array_map('count', $groups));
 
-        // Hero: what Milpa Core is, in a breath, plus the live contract loop.
+        // Hero: what the package is, in a breath (per SiteConfig), plus the live contract loop.
         $html = '<article class="mui-prose docs-gap">'
-            . '<h1 id="milpa-core">Milpa Core <span class="mui-badge mui-badge--accent">v' . self::esc($this->version) . '</span></h1>'
-            . '<p>The framework-agnostic <strong>contracts core</strong> of Milpa — a modular PHP runtime for '
-            . 'applications operable by <strong>both humans and agents</strong>. No ORM, no HTTP client, no kernel: '
-            . 'just the primitives every Milpa module builds on.</p>'
+            . '<h1 id="' . self::esc($this->config->brandSlug()) . '">' . self::esc($this->config->brand)
+            . ' <span class="mui-badge mui-badge--accent">v' . self::esc($this->version) . '</span></h1>'
+            . '<p>' . $this->config->heroParagraph . '</p>'
             . '<p>Modules declare the <em>capabilities</em> they provide and require, expose <em>tools</em> an agent '
             . 'can invoke, and gate mutating actions behind <em>verification</em>. The contract loop that runs through '
             . 'the whole system:</p>'
@@ -204,7 +213,7 @@ final class SiteGenerator
         // Install snippet, dressed as a design-system code block.
         $html .= '<div class="mui-code docs-gap"><div class="mui-code__header">'
             . '<span class="mui-code__file">install</span><span class="mui-code__lang">bash</span></div>'
-            . '<div class="mui-code__body"><pre><code>composer require milpa/core</code></pre></div></div>';
+            . '<div class="mui-code__body"><pre><code>' . self::esc($this->config->installCommand) . '</code></pre></div></div>';
 
         // API index — grouped by namespace, each group anchored so breadcrumbs can deep-link.
         $html .= '<article class="mui-prose docs-gap"><h2 id="api-reference">API reference</h2>'
@@ -227,7 +236,11 @@ final class SiteGenerator
         return $html;
     }
 
-    /** Breadcrumb trail for a type page: Docs / &lt;group&gt; / &lt;TypeName&gt;. */
+    /**
+     * Breadcrumb trail for a type page: Docs / &lt;group&gt; / &lt;TypeName&gt;.
+     *
+     * @param \ReflectionClass<object> $rc
+     */
     private function breadcrumb(\ReflectionClass $rc): string
     {
         $group = $this->groupOf($rc);

@@ -88,6 +88,9 @@ final class Signature
             is_bool($value) => $value ? 'true' : 'false',
             is_string($value) => "'" . $value . "'",
             is_array($value) => '[]',
+            // PHP 8.1+ "new in initializers": the reflected default IS an instance —
+            // casting it to string fatals unless it happens to have __toString().
+            is_object($value) => 'new ' . (new \ReflectionClass($value))->getShortName() . '()',
             default => (string) $value,
         };
     }

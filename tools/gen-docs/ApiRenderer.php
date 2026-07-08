@@ -21,6 +21,9 @@ namespace Milpa\Docs;
  */
 final class ApiRenderer
 {
+    /**
+     * @param \ReflectionClass<object> $rc
+     */
     public function type(\ReflectionClass $rc): string
     {
         $doc = DocBlock::of($rc->getDocComment());

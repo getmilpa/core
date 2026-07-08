@@ -126,4 +126,24 @@ final class VerifierInterfaceAndEventsTest extends TestCase
         $this->assertSame('corr-123', $granted->getRequestId());
         $this->assertSame('corr-123', $rejected->getRequestId());
     }
+
+    /**
+     * The resolution seam (#7 follow-up): a caller resolving a pending verification by
+     * `request_id` alone — no request-store seam exists, so `subject` is genuinely unknown —
+     * builds the reconstruction via {@see VerificationRequest::forResolution()} instead of
+     * fabricating a fake subject. The granted/rejected events still carry a full, valid
+     * request and still expose the correlation id; only `subject` is null.
+     */
+    public function testGrantedAndRejectedEventsAcceptAResolutionOnlyRequest(): void
+    {
+        $req = VerificationRequest::forResolution('corr-456');
+
+        $granted = new VerificationGrantedEvent($req, VerificationResult::pass());
+        $rejected = new VerificationRejectedEvent($req, VerificationResult::fail('nope'));
+
+        $this->assertNull($granted->getRequest()->subject);
+        $this->assertSame('corr-456', $granted->getRequestId());
+        $this->assertNull($rejected->getRequest()->subject);
+        $this->assertSame('corr-456', $rejected->getRequestId());
+    }
 }

@@ -20,11 +20,17 @@ namespace Milpa\Docs;
  * topbar, 3-col grid and footer. Reference scope only (Phase 2) — the proof's search dialog and
  * interactive version-switcher menu are intentionally dropped, along with the JS they need; only the
  * theme-toggle behavior ships, plus a non-interactive version indicator threaded from the caller.
+ *
+ * Branding (title suffix, topbar links, footer `utm_content`) comes from {@see SiteConfig};
+ * omit it to get today's core-branded chrome unchanged.
  */
 final class Shell
 {
-    public function __construct(private readonly string $cssBase, private readonly string $version)
-    {
+    public function __construct(
+        private readonly string $cssBase,
+        private readonly string $version,
+        private readonly SiteConfig $config = new SiteConfig(),
+    ) {
     }
 
     public function page(string $title, string $navHtml, string $mainHtml, string $tocHtml): string
@@ -54,8 +60,8 @@ final class Shell
         return '<head>'
             . '<meta charset="utf-8">'
             . '<meta name="viewport" content="width=device-width, initial-scale=1">'
-            . '<title>' . self::esc($title) . ' · Milpa Core v' . self::esc($this->version) . '</title>'
-            . '<meta name="description" content="Milpa Core API reference, generated from source.">'
+            . '<title>' . self::esc($title) . ' · ' . self::esc($this->config->brand) . ' v' . self::esc($this->version) . '</title>'
+            . '<meta name="description" content="' . self::esc($this->config->brand) . ' API reference, generated from source.">'
             . '<link rel="preconnect" href="https://fonts.googleapis.com">'
             . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
             . '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">'
@@ -101,7 +107,7 @@ final class Shell
     private function topbar(): string
     {
         return '<header class="mui-docs__topbar">'
-            . '<a class="mui-docs__brand" href="https://getmilpa.github.io/core/">'
+            . '<a class="mui-docs__brand" href="' . self::esc($this->config->pagesUrl) . '">'
             . '<svg class="docs-plot" aria-hidden="true" width="20" height="20" viewBox="0 0 60 60">'
             . '<g fill="var(--oro-300)">'
             . '<rect x="0" y="0" width="10" height="10" rx="2.5"/><rect x="50" y="0" width="10" height="10" rx="2.5"/>'
@@ -117,7 +123,7 @@ final class Shell
             . '<span class="mui-version-switcher">v' . self::esc($this->version) . '</span>'
             . '<div class="mui-docs__topbar-actions">'
             . '<button type="button" class="mui-btn mui-btn--sm docs-theme-toggle" id="theme-toggle" aria-label="Toggle theme">◐ dark</button>'
-            . '<a class="mui-btn mui-btn--ghost mui-btn--icon" href="https://github.com/getmilpa/core" aria-label="Milpa on GitHub">'
+            . '<a class="mui-btn mui-btn--ghost mui-btn--icon" href="' . self::esc($this->config->repoUrl) . '" aria-label="Milpa on GitHub">'
             . '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>'
             . '</a>'
             . '</div>'
@@ -129,7 +135,7 @@ final class Shell
         return '<footer class="docs-footer">'
             . '<svg class="docs-wordmark" viewBox="0 0 2406.90 900.00" role="img" aria-label="milpa"><use href="#wm-milpa"/></svg>'
             . '<p class="docs-footer__tagline">Siembra módulos, cosecha aplicaciones.</p>'
-            . '<p class="docs-footer__credit">Developed by <a href="https://teamx.agency/?utm_source=milpa-docs&utm_medium=footer&utm_campaign=milpa&utm_content=core">TeamX Agency</a></p>'
+            . '<p class="docs-footer__credit">Developed by <a href="https://teamx.agency/?utm_source=milpa-docs&utm_medium=footer&utm_campaign=milpa&utm_content=' . self::esc($this->config->utmContent) . '">TeamX Agency</a></p>'
             . '<p class="docs-footer__legal">© 2026 Milpa · Apache-2.0 · docs built from v' . self::esc($this->version) . '</p>'
             . '</footer>';
     }
