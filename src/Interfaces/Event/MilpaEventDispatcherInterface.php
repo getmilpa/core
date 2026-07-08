@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace Milpa\Interfaces\Event;
 
+use Milpa\Events\InterceptionSlot;
+
 /**
  * Event Dispatcher Interface
  *
@@ -39,9 +41,37 @@ interface MilpaEventDispatcherInterface
      * a deviation. An implementation MUST NOT silently drop the event because
      * no queue is wired.
      *
+     * **The emitter<->slot interception contract (KEYSTONE, core 0.5).** Events
+     * stay ALWAYS readonly; the one escape hatch for veto/short-circuit is
+     * {@see InterceptionSlot}, a single mutable object dispatched ALONGSIDE the
+     * readonly event, never in place of it. This is a binding MUST/MAY contract
+     * for every conformant implementation:
+     * - The emitter (the class calling `dispatch()`) that wants interception MUST
+     *   pass a payload shaped `['event' => $readonlyEvent, 'slot' => new InterceptionSlot()]`
+     *   and, after `dispatch()` returns, MUST read the slot back — `$slot->hasResult()`
+     *   for a short-circuit result, `$slot->isStopped()` for a pure veto — to decide
+     *   what to do next. An emitter that dispatches a slot and never reads it back has
+     *   built a no-op interception point; the dispatcher does not act on the slot for you.
+     * - The dispatcher MUST, after EACH handler's error-isolating try/catch — UNCONDITIONALLY,
+     *   whether or not that handler threw — check whether `payload['slot']` is an
+     *   {@see InterceptionSlot} and, if `$slot->isStopped()`, stop invoking further
+     *   handlers for this dispatch. A handler that calls `$slot->stop()` (or
+     *   `shortCircuit()`) and THEN throws still stops propagation — the stop check
+     *   happens after the catch, not only on the clean-return path.
+     * - A payload with no `'slot'` key (or a `'slot'` that is not an {@see InterceptionSlot})
+     *   MUST behave byte-identically to a dispatcher with no interception support at
+     *   all — this is strictly additive, zero-risk for every existing emitter.
+     * - `$async = true` combined with an {@see InterceptionSlot} present in the payload
+     *   MUST throw. Interception is inherently synchronous: a slot handed to a queue
+     *   is never re-read by the emitter, so the short-circuit/veto would be silently
+     *   swallowed — a correctness trap, not a style preference. Implementations MUST
+     *   reject this combination rather than degrade it.
+     *
      * @param string               $eventName Event name (e.g., 'user.registered', 'order.shipped')
-     * @param array<string, mixed> $payload   Data to pass to handlers
-     * @param bool                 $async     If true, requests deferred (queued) execution — see the `$async` semantics paragraph above for the no-queue fallback contract
+     * @param array<string, mixed> $payload   Data to pass to handlers — MAY include `'event'` (the readonly
+     *                                        event object, family convention since core 0.3) and/or `'slot'`
+     *                                        (an {@see InterceptionSlot}, per the contract above)
+     * @param bool                 $async     If true, requests deferred (queued) execution — see the `$async` semantics paragraph above for the no-queue fallback contract, and the emitter<->slot contract above for why `$async = true` with a slot MUST throw
      *
      * @return void
      */
