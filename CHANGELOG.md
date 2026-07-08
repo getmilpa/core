@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0](https://github.com/getmilpa/core/compare/v0.3.0...v0.4.0) (2026-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* verification resolution seam + parametrized docs generator
+
+### Features
+
+* verification resolution seam + parametrized docs generator ([a8fbc9c](https://github.com/getmilpa/core/commit/a8fbc9cd8bcdb94ec032b029f921d0314acde164))
+
 ## [0.3.0](https://github.com/getmilpa/core/compare/v0.2.1...v0.3.0) (2026-07-07)
 
 
