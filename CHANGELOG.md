@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.0](https://github.com/getmilpa/core/compare/v0.4.0...v0.5.0) (2026-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* event interception seam — InterceptionSlot + stoppable dispatch contract
+
+### Features
+
+* event interception seam — InterceptionSlot + stoppable dispatch contract ([194e46b](https://github.com/getmilpa/core/commit/194e46b05917cd6a52607df9f108c16e500798df))
+
 ## [0.4.0](https://github.com/getmilpa/core/compare/v0.3.0...v0.4.0) (2026-07-08)
 
 
