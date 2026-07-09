@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.1](https://github.com/getmilpa/core/compare/v0.5.0...v0.5.1) (2026-07-09)
+
+
+### Features
+
+* promote the lifecycle event VOs into Milpa\Events ([f202fe4](https://github.com/getmilpa/core/commit/f202fe43c006f485e72f0586faea0f4714ed06c7))
+
+
+### Miscellaneous Chores
+
+* release 0.5.1 ([0826f05](https://github.com/getmilpa/core/commit/0826f053d1c268ec4d39ec2c99ac18604db46554))
+
 ## [0.5.0](https://github.com/getmilpa/core/compare/v0.4.0...v0.5.0) (2026-07-08)
 
 
