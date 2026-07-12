@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/getmilpa/core/compare/v0.5.1...v0.5.2) (2026-07-12)
+
+
+### Bug Fixes
+
+* open PluginDependencyException for subclassing ([609766e](https://github.com/getmilpa/core/commit/609766eb68ba8b885f618cf7262589d94a6a49d7))
+
 ## [0.5.1](https://github.com/getmilpa/core/compare/v0.5.0...v0.5.1) (2026-07-09)
 
 
