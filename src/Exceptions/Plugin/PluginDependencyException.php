@@ -19,8 +19,12 @@ use Milpa\Exceptions\MilpaExceptionInterface;
 /**
  * Thrown when a plugin declares a dependency (another plugin, a Composer
  * package, etc.) that is not available in the current environment.
+ *
+ * Deliberately open (non-final): `milpa/runtime`'s `ArchitectureBlockedException`
+ * subclasses it to carry the resolver's full `ResolutionReport` while every
+ * existing `catch (PluginDependencyException)` keeps working unchanged.
  */
-final class PluginDependencyException extends \RuntimeException implements MilpaExceptionInterface
+class PluginDependencyException extends \RuntimeException implements MilpaExceptionInterface
 {
     /**
      * Builds the exception for a plugin dependency that could not be satisfied.
