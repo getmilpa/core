@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.6.0](https://github.com/getmilpa/core/compare/v0.5.2...v0.6.0) (2026-07-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* exclusive defaults to true — capability-spec §3.1 canon
+
+### Bug Fixes
+
+* exclusive defaults to true — capability-spec §3.1 canon ([25567fa](https://github.com/getmilpa/core/commit/25567fa8438b2ceb0bc1f29f198c683256ba9ec3))
+
 ## [0.5.2](https://github.com/getmilpa/core/compare/v0.5.1...v0.5.2) (2026-07-12)
 
 
