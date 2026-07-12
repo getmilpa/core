@@ -55,7 +55,46 @@ final class CapabilityProvisionTest extends TestCase
 
         $this->assertNull($vo->service);
         $this->assertSame(0, $vo->priority);
-        $this->assertFalse($vo->exclusive);
+        $this->assertTrue(
+            $vo->exclusive,
+            'capability-spec §3.1: "id MUST be globally unique in the installed graph unless '
+            . '`exclusive=false` allows multi-provider lists" — a record that does not declare '
+            . '`exclusive` defaults to true, matching milpa-plugin.schema.json.'
+        );
+    }
+
+    /**
+     * The primary constructor applies the same §3.1 canon default as fromArray(): a
+     * hand-built record that does not declare `exclusive` claims its id exclusively.
+     */
+    public function testConstructorDefaultsExclusiveToTrue(): void
+    {
+        $vo = new CapabilityProvision(id: 'x.y', interface: 'App\\Contracts\\Thing', contractVersion: '1.0.0');
+
+        $this->assertTrue($vo->exclusive, 'the constructor default follows the schema default (true)');
+    }
+
+    /**
+     * Declaring `exclusive: false` is the spec's explicit opt-in to multi-provider lists —
+     * the default flipping to true must not swallow the declared opt-out.
+     */
+    public function testExplicitExclusiveFalseIsPreserved(): void
+    {
+        $fromArray = CapabilityProvision::fromArray([
+            'id' => 'example.logger',
+            'interface' => 'App\\Contracts\\LoggerInterface',
+            'contractVersion' => '2.1.0',
+            'exclusive' => false,
+        ]);
+        $this->assertFalse($fromArray->exclusive);
+
+        $constructed = new CapabilityProvision(
+            id: 'x.y',
+            interface: 'App\\Contracts\\Thing',
+            contractVersion: '1.0.0',
+            exclusive: false,
+        );
+        $this->assertFalse($constructed->exclusive);
     }
 
     public function testFromInterfaceWrapsLegacyBareFqcn(): void
@@ -67,6 +106,12 @@ final class CapabilityProvisionTest extends TestCase
         $this->assertSame($fqcn, $vo->id, 'legacy id falls back to the interface FQCN');
         $this->assertSame('0.0.0', $vo->contractVersion, 'legacy capability is unversioned');
         $this->assertNull($vo->service);
+        $this->assertFalse(
+            $vo->exclusive,
+            'legacy bare-FQCN declarations predate the `exclusive` field and cannot opt out of it, '
+            . 'so the legacy wrapper pins exclusive=false — preserving the documented multi-provider '
+            . 'last-wins semantics the resolver replicates from the legacy ContractResolver.'
+        );
     }
 
     public function testParseDispatchesStringToLegacyAndArrayToRecord(): void

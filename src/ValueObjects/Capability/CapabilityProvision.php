@@ -31,6 +31,14 @@ use Milpa\ValueObjects\SemanticVersion;
  * There is no "trusted, pre-validated" construction path — hand-building a
  * record (e.g. `new CapabilityProvision(...)` from reflected `#[PluginMetadata]`
  * data) is validated identically to parsing one from a manifest.
+ *
+ * `exclusive` defaults to TRUE, per capability-spec §3.1, verbatim: "`id` MUST
+ * be globally unique in the installed graph unless `exclusive=false` allows
+ * multi-provider lists" — the same default `milpa-plugin.schema.json` declares.
+ * Providers that legitimately share an id must opt out with an explicit
+ * `exclusive: false`. The legacy bare-FQCN wrapper {@see fromInterface()} is
+ * the one deliberate exception: it pins `exclusive: false` because legacy
+ * declarations predate the field and carry documented multi-provider semantics.
  */
 final class CapabilityProvision
 {
@@ -43,7 +51,7 @@ final class CapabilityProvision
         public readonly string $contractVersion,
         public readonly ?string $service = null,
         public readonly int $priority = 0,
-        public readonly bool $exclusive = false,
+        public readonly bool $exclusive = true,
     ) {
         if (trim($this->id) === '') {
             throw new \InvalidArgumentException('Capability `provides` record requires a non-empty "id".');
@@ -84,13 +92,21 @@ final class CapabilityProvision
             interface: $interface,
             contractVersion: $contractVersion,
             service: $service,
+            // capability-spec §3.1: "id MUST be globally unique in the installed graph unless
+            // `exclusive=false` allows multi-provider lists" — absent means exclusive.
             priority: (int) ($record['priority'] ?? 0),
-            exclusive: (bool) ($record['exclusive'] ?? false),
+            exclusive: (bool) ($record['exclusive'] ?? true),
         );
     }
 
     /**
      * Wrap a legacy bare-FQCN declaration as an unversioned record.
+     *
+     * Pins `exclusive: false` explicitly: a legacy declaration predates the `exclusive`
+     * field, so it cannot opt out of §3.1's exclusive-by-default rule — and the legacy
+     * graph's documented semantics allow duplicated providers (last provider wins as the
+     * ordering edge source). Applying the structured-record default retroactively would
+     * turn every duplicated legacy provider into a blocking conflict.
      */
     public static function fromInterface(string $interface): self
     {
@@ -103,6 +119,7 @@ final class CapabilityProvision
             id: $interface,
             interface: $interface,
             contractVersion: '0.0.0',
+            exclusive: false,
         );
     }
 
