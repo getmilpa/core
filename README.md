@@ -47,6 +47,10 @@ Three seams in this package make that loop possible:
 
 - **Capability system** — a plugin manifest declares what it *provides*, *requires*, and
   *suggests*, so the runtime can wire modules together and reason about what's installed.
+  Each entry comes in either real shape `#[PluginMetadata]` sanctions: a bare interface
+  FQCN (legacy) or a structured capability record (`{id, interface, contractVersion, …}`),
+  parsed by the capability value objects' `parse()` — mixing both in one list is the
+  incremental migration path.
 - **Agent tool-readiness** — `ToolProviderInterface` / `ToolRegistryInterface` let a module
   publish declarative tools that both humans and agents can discover and call.
 - **Verification seam** — `VerifierInterface` gates a mutating action behind a
@@ -106,8 +110,8 @@ issues via [SECURITY.md](SECURITY.md), and note that this project follows a
 
 ## License
 
-[Apache-2.0](LICENSE) © TeamX Agency.
+[Apache-2.0](LICENSE) © Rodrigo Vicente - TeamX Agency.
 
 ---
 
-Milpa is designed, built, and maintained by **[TeamX Agency](https://teamx.agency/?utm_source=github&utm_medium=readme&utm_campaign=milpa&utm_content=core)**.
+Milpa is designed, built, and maintained by **[Rodrigo Vicente - TeamX Agency](https://teamx.agency/?utm_source=github&utm_medium=readme&utm_campaign=milpa&utm_content=core)**.

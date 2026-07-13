@@ -3,7 +3,7 @@
 /**
  * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
  *
- * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ * (c) Rodrigo Vicente - TeamX Agency — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
  *
@@ -33,14 +33,19 @@ use Milpa\Exceptions\Plugin\PluginDependencyException;
  * being an optional dependency with a `fallback`, and this checker honors it
  * by simply never looking at `suggests`.
  *
- * This check only reasons about interface identity (does *some* plugin
- * provide the required interface at all), not about `contractVersion`
- * ranges or `oneOf` alternatives — `#[PluginMetadata]::$provides` /
- * `$requires` are bare interface FQCN lists, they carry no version
- * information to range-check against. A host that manages versioned
- * capability records (`CapabilityProvision`/`CapabilityRequirement` built
- * from a manifest via `fromArray()`) needs a richer checker; this one
- * covers the common case the attribute itself can express.
+ * This check only reasons about IDENTITY (does *some* plugin provide the
+ * required thing at all), never about `contractVersion`/`constraint`
+ * ranges — range-checking is the architecture resolver's job. A
+ * `#[PluginMetadata]` entry may be a bare interface FQCN (legacy) or a
+ * structured capability record (canonical — T087): a bare string is one
+ * identity, verbatim; a record provides BOTH its capability `id` and its
+ * `interface`, and a record requirement is satisfied by its `id`, its
+ * `interface`, or any of its `oneOf` alternatives (a requirement the
+ * resolver would satisfy via `oneOf` must not fail pre-boot here). A
+ * record entry with no readable identity contributes nothing — teaching
+ * the malformed-record failure is the ingestion layer's job
+ * ({@see \Milpa\ValueObjects\Capability\CapabilityProvision::fromArray()}),
+ * not this check's.
  */
 final class CapabilityGraphChecker
 {
@@ -64,18 +69,93 @@ final class CapabilityGraphChecker
 
         $provided = [];
         foreach ($metadata as $meta) {
-            foreach ($meta->provides as $interface) {
-                $provided[$interface] = true;
+            foreach ($meta->provides as $entry) {
+                foreach ($this->identitiesOf($entry) as $identity) {
+                    $provided[$identity] = true;
+                }
             }
         }
 
         foreach ($metadata as $meta) {
-            foreach ($meta->requires as $interface) {
-                if (!isset($provided[$interface])) {
-                    throw PluginDependencyException::unmet($meta->name, $interface);
+            foreach ($meta->requires as $entry) {
+                $alternatives = $this->alternativesOf($entry);
+                if ($alternatives === []) {
+                    continue;
+                }
+                if (!$this->anyProvided($provided, $alternatives)) {
+                    throw PluginDependencyException::unmet($meta->name, $alternatives[0]);
                 }
             }
         }
+    }
+
+    /**
+     * The identity strings one capability entry contributes: the string itself
+     * (verbatim) for a bare FQCN, or the record's `id` and `interface` for a
+     * structured capability record. An entry that is neither yields nothing.
+     *
+     * @return list<string>
+     */
+    private function identitiesOf(mixed $entry): array
+    {
+        if (is_string($entry)) {
+            return [$entry];
+        }
+
+        if (!is_array($entry)) {
+            return [];
+        }
+
+        $identities = [];
+        foreach (['id', 'interface'] as $key) {
+            $value = $entry[$key] ?? null;
+            if (is_string($value) && trim($value) !== '') {
+                $identities[] = trim($value);
+            }
+        }
+
+        return $identities;
+    }
+
+    /**
+     * Every identity that can satisfy one `requires` entry: its own identities
+     * plus any `oneOf` alternatives a structured record declares. The FIRST
+     * entry (a record's `id`, or the bare FQCN itself) names the requirement
+     * in failure messages.
+     *
+     * @return list<string>
+     */
+    private function alternativesOf(mixed $entry): array
+    {
+        $alternatives = $this->identitiesOf($entry);
+
+        if (is_array($entry)) {
+            $oneOf = $entry['oneOf'] ?? [];
+            foreach (is_array($oneOf) ? $oneOf : [] as $candidate) {
+                if (is_string($candidate) && trim($candidate) !== '') {
+                    $alternatives[] = trim($candidate);
+                }
+            }
+        }
+
+        return $alternatives;
+    }
+
+    /**
+     * Whether any of the requirement's alternatives is in the provided set.
+     *
+     * @param array<string, true> $provided
+     * @param list<string>        $alternatives
+     */
+    private function anyProvided(array $provided, array $alternatives): bool
+    {
+        foreach ($alternatives as $alternative) {
+            if (isset($provided[$alternative])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

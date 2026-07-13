@@ -3,7 +3,7 @@
 /**
  * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
  *
- * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ * (c) Rodrigo Vicente - TeamX Agency — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
  *
@@ -162,10 +162,14 @@ interface PluginManifestInterface
     public function getAuthors(): array;
 
     /**
-     * Convert to the legacy metadata-array shape (`Plugins::$plugins`) that some
-     * consumers still read instead of the typed accessors above.
+     * Convert to the metadata-array shape (`Plugins::$plugins`) that some
+     * consumers still read instead of the typed accessors above. The three
+     * capability lists carry the manifest's RAW declarations in whichever
+     * shape it speaks: legacy bare interface FQCN strings, or canonical
+     * capability records (see the capability value objects) — consumers must
+     * accept both, exactly like `#[PluginMetadata]`'s lists.
      *
-     * @return array{name:string, version:string, author:string, site:string, type:string, provides:array<class-string>, requires:array<class-string>, suggests:array<class-string>}
+     * @return array{name:string, version:string, author:string, site:string, type:string, provides:array<int, class-string|array<string, mixed>>, requires:array<int, class-string|array<string, mixed>>, suggests:array<int, class-string|array<string, mixed>>}
      */
     public function toMetadataArray(): array;
 

@@ -3,7 +3,7 @@
 /**
  * This file is part of Milpa Core — the framework-agnostic core of the Milpa PHP framework.
  *
- * (c) TeamX — https://teamx.agency <hola@teamx.agency>
+ * (c) Rodrigo Vicente - TeamX Agency — https://teamx.agency <hola@teamx.agency>
  *
  * @license Apache-2.0
  *
@@ -134,6 +134,119 @@ final class CapabilityGraphCheckerTest extends TestCase
 
         $this->expectException(AttributeNotFoundException::class);
         $checker->check([new FakePluginWithoutMetadata()]);
+    }
+
+    public function testARichProvidesRecordSatisfiesABareRequireByItsInterface(): void
+    {
+        $checker = new CapabilityGraphChecker();
+
+        // T087: a structured capability record provides BOTH identities — its capability id and its
+        // interface FQCN — so a legacy bare-FQCN consumer still finds its provider.
+        $checker->check([
+            new PluginMetadata(
+                version: '1.0.0',
+                author: 'A',
+                site: 'https://example.com',
+                name: 'RichProvider',
+                type: 'Service',
+                provides: [[
+                    'id' => 'crm.widget.v1',
+                    'interface' => 'Fake\\WidgetServiceInterface',
+                    'contractVersion' => '1.0.0',
+                    'service' => 'Fake\\WidgetService',
+                ]],
+            ),
+            new FakeConsumerPlugin(),
+        ]);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testARichRequireIsMatchedByItsCapabilityId(): void
+    {
+        $checker = new CapabilityGraphChecker();
+
+        $checker->check([
+            new PluginMetadata(
+                version: '1.0.0',
+                author: 'A',
+                site: 'https://example.com',
+                name: 'RichProvider',
+                type: 'Service',
+                provides: [[
+                    'id' => 'crm.widget.v1',
+                    'interface' => 'Fake\\WidgetServiceInterface',
+                    'contractVersion' => '1.0.0',
+                    'service' => 'Fake\\WidgetService',
+                ]],
+            ),
+            new PluginMetadata(
+                version: '1.0.0',
+                author: 'A',
+                site: 'https://example.com',
+                name: 'RichConsumer',
+                type: 'Service',
+                requires: [[
+                    'id' => 'crm.widget.v1',
+                    'interface' => 'Fake\\SomeOtherInterface',
+                    'constraint' => '^1.0',
+                ]],
+            ),
+        ]);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testARichRequireIsSatisfiedByAOneOfAlternative(): void
+    {
+        $checker = new CapabilityGraphChecker();
+
+        // Identity-only check, like everything here — but a requirement the engine would resolve via
+        // a `oneOf` alternative must not fail pre-boot either.
+        $checker->check([
+            new FakeProviderPlugin(), // provides the bare 'Fake\WidgetServiceInterface'
+            new PluginMetadata(
+                version: '1.0.0',
+                author: 'A',
+                site: 'https://example.com',
+                name: 'OneOfConsumer',
+                type: 'Service',
+                requires: [[
+                    'id' => 'crm.widget.v1',
+                    'interface' => 'Fake\\UnprovidedInterface',
+                    'constraint' => '^1.0',
+                    'oneOf' => ['Fake\\WidgetServiceInterface'],
+                ]],
+            ),
+        ]);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testAnUnmetRichRequireNamesItsCapabilityIdInTheException(): void
+    {
+        $checker = new CapabilityGraphChecker();
+
+        try {
+            $checker->check([
+                new PluginMetadata(
+                    version: '1.0.0',
+                    author: 'A',
+                    site: 'https://example.com',
+                    name: 'RichConsumer',
+                    type: 'Service',
+                    requires: [[
+                        'id' => 'crm.widget.v1',
+                        'interface' => 'Fake\\UnprovidedInterface',
+                        'constraint' => '^1.0',
+                    ]],
+                ),
+            ]);
+            $this->fail('Expected a PluginDependencyException.');
+        } catch (PluginDependencyException $exception) {
+            $this->assertStringContainsString('RichConsumer', $exception->getMessage());
+            $this->assertStringContainsString('crm.widget.v1', $exception->getMessage());
+        }
     }
 }
 
