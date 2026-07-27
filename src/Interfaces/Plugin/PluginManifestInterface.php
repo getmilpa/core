@@ -162,7 +162,7 @@ interface PluginManifestInterface
     public function getAuthors(): array;
 
     /**
-     * Convert to the metadata-array shape (`Plugins::$plugins`) that some
+     * Convert to the metadata-array shape (`PluginsManager::$plugins`) that some
      * consumers still read instead of the typed accessors above. The three
      * capability lists carry the manifest's RAW declarations in whichever
      * shape it speaks: legacy bare interface FQCN strings, or canonical
