@@ -186,4 +186,40 @@ final class CapabilityProvisionTest extends TestCase
         $this->assertSame('App\\Contracts\\Thing', $vo->interface);
         $this->assertSame('1.0.0', $vo->contractVersion);
     }
+
+    /**
+     * Un `contractVersion: null` EXPLÍCITO sobrevive el viaje; la AUSENCIA de la llave no.
+     *
+     * Son dos cosas distintas y el defecto sería fundirlas. `null` es «nadie sabe qué versión de
+     * contrato es esto» —lo que serializa un registro legacy y vuelve a leer— y la llave ausente es
+     * un registro rico que no declaró la suya. Aflojar lo segundo convertiría una validación en
+     * silencio; endurecer lo primero rompería los registros que ya existen.
+     */
+    public function testAnExplicitNullContractVersionSurvivesButAMissingKeyDoesNot(): void
+    {
+        $provision = CapabilityProvision::fromArray([
+            'id' => 'demo.almacen.v1',
+            'interface' => 'Acme\\Contracts\\Almacen',
+            'contractVersion' => null,
+            'service' => 'Acme\\SmtpAlmacen',
+        ]);
+
+        self::assertNull($provision->contractVersion, 'el null explícito viaja intacto');
+
+        $this->expectException(\InvalidArgumentException::class);
+        CapabilityProvision::fromArray([
+            'id' => 'demo.almacen.v1',
+            'interface' => 'Acme\\Contracts\\Almacen',
+            'service' => 'Acme\\SmtpAlmacen',
+        ]);
+    }
+
+    /** Una interfaz vacía se rechaza al construir: una capacidad sin contrato no es una capacidad. */
+    public function testAnEmptyInterfaceIsRefused(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/non-empty/');
+
+        CapabilityProvision::fromInterface('   ');
+    }
 }
