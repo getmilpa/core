@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.0](https://github.com/getmilpa/core/compare/v0.6.1...v0.7.0) (2026-08-01)
+
+
+### Features
+
+* CapabilityMatcher — una sola ley de identidad de capacidad ([4c989da](https://github.com/getmilpa/core/commit/4c989da14ac1ede6e92a03638139884308a729cc))
+* publicar Secret, SecretMissingException y TopologicalSorter ([c4c5deb](https://github.com/getmilpa/core/commit/c4c5debdae1a0c631b8ae96f1f906cf2e0a0aa2a))
+
 ## [0.6.1](https://github.com/getmilpa/core/compare/v0.6.0...v0.6.1) (2026-07-13)
 
 
