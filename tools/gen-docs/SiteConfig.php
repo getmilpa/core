@@ -49,6 +49,14 @@ final class SiteConfig
             . 'just the primitives every Milpa module builds on.',
         /** `utm_content` value on the footer's "Developed by TeamX Agency" credit link. */
         public readonly string $utmContent = 'core',
+        /**
+         * Directorio con las páginas narrativas, relativo a la raíz del paquete.
+         *
+         * Es la fase 3 de D14: la referencia se genera de los docblocks y la narrativa se escribe a
+         * mano, las dos en el mismo sitio. Si el directorio no existe, el sitio sale sólo con
+         * referencia — un paquete sin guías no es un error, es un paquete que todavía no las tiene.
+         */
+        public readonly string $narrativeDir = 'docs',
     ) {
     }
 

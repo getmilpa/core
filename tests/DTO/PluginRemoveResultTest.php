@@ -55,4 +55,39 @@ final class PluginRemoveResultTest extends TestCase
         self::assertSame('still required by ShopPlugin', $result->error);
         self::assertSame(0, $result->migrationsReverted, 'Nothing was reverted, because nothing ran.');
     }
+    /**
+     * El constructor primario, no sólo los nombrados.
+     *
+     * Esta cobertura vivía en una copia del host con el mismo nombre de archivo; se movió aquí al
+     * consolidar (P17.3) porque el DTO es del paquete y su prueba también. Sin ella, `success()` y
+     * `failure()` quedaban probados y la construcción directa no.
+     */
+    public function testTheConstructorDefaultsToNoDataKeptAndNoMigrations(): void
+    {
+        $result = new PluginRemoveResult(success: true, pluginName: 'BlogEngine');
+
+        self::assertTrue($result->success);
+        self::assertSame('BlogEngine', $result->pluginName);
+        self::assertFalse($result->dataKept);
+        self::assertSame(0, $result->migrationsReverted);
+        self::assertNull($result->error);
+    }
+
+    /** Y con todos los campos puestos a mano, incluido un fallo que sí conservó datos. */
+    public function testTheConstructorCarriesEveryField(): void
+    {
+        $result = new PluginRemoveResult(
+            success: false,
+            pluginName: 'BlogEngine',
+            dataKept: true,
+            migrationsReverted: 3,
+            error: 'still required by ShopPlugin',
+        );
+
+        self::assertFalse($result->success);
+        self::assertSame('BlogEngine', $result->pluginName);
+        self::assertTrue($result->dataKept);
+        self::assertSame(3, $result->migrationsReverted);
+        self::assertSame('still required by ShopPlugin', $result->error);
+    }
 }

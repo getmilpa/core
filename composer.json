@@ -1,6 +1,15 @@
 {
   "name": "milpa/core",
   "description": "Milpa Framework \u2014 core contracts and primitives. Framework-agnostic: no ORM, no HTTP client, no host-application coupling (ADR-001).",
+  "keywords": [
+    "php",
+    "milpa",
+    "framework",
+    "contracts",
+    "primitives",
+    "value-objects",
+    "framework-agnostic"
+  ],
   "type": "library",
   "license": "Apache-2.0",
   "authors": [

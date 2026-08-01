@@ -32,26 +32,36 @@ use Milpa\ValueObjects\SemanticVersion;
  * record (e.g. `new CapabilityProvision(...)` from reflected `#[PluginMetadata]`
  * data) is validated identically to parsing one from a manifest.
  *
- * `exclusive` defaults to TRUE, per capability-spec §3.1, verbatim: "`id` MUST
- * be globally unique in the installed graph unless `exclusive=false` allows
- * multi-provider lists" — the same default `milpa-plugin.schema.json` declares.
- * Providers that legitimately share an id must opt out with an explicit
- * `exclusive: false`. The legacy bare-FQCN wrapper {@see fromInterface()} is
- * the one deliberate exception: it pins `exclusive: false` because legacy
- * declarations predate the field and carry documented multi-provider semantics.
+ * `exclusive` is TRI-STATE, and NULL means nobody decided.
+ *
+ * It used to default TRUE for a rich record and FALSE for a bare FQCN, so the
+ * same capability admitted one or several providers depending on HOW IT WAS
+ * WRITTEN — and the documented migration path runs bare → rich, so migrating a
+ * multi-provider capability as the docs recommend would have blocked boot.
+ * {@see \Milpa\Services\CapabilityMatcher} killed the same shape for
+ * `contractVersion`; this is the same lie one field over.
+ *
+ * ADR-0037 measured that nobody decides the cardinality of a capability today
+ * and refused to legislate who should. So this field stops inventing an answer:
+ * an explicit `true`/`false` is a decision, absence is the absence of one, and
+ * what the resolver does with an undecided cardinality is the resolver's to
+ * report — never this record's to guess.
  */
 final class CapabilityProvision
 {
     /**
+     * @param string|null $contractVersion NULL means nobody declared one. Only {@see fromInterface()}
+     *                                     produces it: a rich record must still declare its version.
+     *
      * @throws \InvalidArgumentException If `id`/`interface` are empty or `contractVersion` is not valid semver.
      */
     public function __construct(
         public readonly string $id,
         public readonly string $interface,
-        public readonly string $contractVersion,
+        public readonly ?string $contractVersion,
         public readonly ?string $service = null,
         public readonly int $priority = 0,
-        public readonly bool $exclusive = true,
+        public readonly ?bool $exclusive = null,
     ) {
         if (trim($this->id) === '') {
             throw new \InvalidArgumentException('Capability `provides` record requires a non-empty "id".');
@@ -63,8 +73,11 @@ final class CapabilityProvision
             );
         }
 
-        // Throws \InvalidArgumentException when not valid semver.
-        SemanticVersion::parse($this->contractVersion);
+        // NULL means UNKNOWN — nobody declared a contract version. Anything else must be real
+        // semver, so an empty string still fails exactly as it did before.
+        if ($this->contractVersion !== null) {
+            SemanticVersion::parse($this->contractVersion);
+        }
     }
 
     /**
@@ -81,7 +94,12 @@ final class CapabilityProvision
     {
         $id = trim((string) ($record['id'] ?? ''));
         $interface = trim((string) ($record['interface'] ?? ''));
-        $contractVersion = trim((string) ($record['contractVersion'] ?? ''));
+        // Un `null` EXPLÍCITO significa desconocida y viaja intacto — es lo que un registro legacy
+        // serializa y vuelve a leer. La AUSENCIA de la llave sigue siendo un error: un registro rico
+        // tiene que declarar su versión, y aflojar eso convertiría una validación en silencio.
+        $contractVersion = \array_key_exists('contractVersion', $record) && $record['contractVersion'] === null
+            ? null
+            : trim((string) ($record['contractVersion'] ?? ''));
 
         $service = isset($record['service']) && (string) $record['service'] !== ''
             ? (string) $record['service']
@@ -92,21 +110,22 @@ final class CapabilityProvision
             interface: $interface,
             contractVersion: $contractVersion,
             service: $service,
-            // capability-spec §3.1: "id MUST be globally unique in the installed graph unless
-            // `exclusive=false` allows multi-provider lists" — absent means exclusive.
             priority: (int) ($record['priority'] ?? 0),
-            exclusive: (bool) ($record['exclusive'] ?? true),
+            // Sólo una declaración EXPLÍCITA decide. La ausencia viaja como `null`.
+            exclusive: \array_key_exists('exclusive', $record) && $record['exclusive'] !== null
+                ? (bool) $record['exclusive']
+                : null,
         );
     }
 
     /**
-     * Wrap a legacy bare-FQCN declaration as an unversioned record.
+     * Wrap a legacy bare-FQCN declaration as a record whose contract version is UNKNOWN.
      *
-     * Pins `exclusive: false` explicitly: a legacy declaration predates the `exclusive`
-     * field, so it cannot opt out of §3.1's exclusive-by-default rule — and the legacy
-     * graph's documented semantics allow duplicated providers (last provider wins as the
-     * ordering edge source). Applying the structured-record default retroactively would
-     * turn every duplicated legacy provider into a blocking conflict.
+     * Leaves `exclusive` NULL: a legacy declaration predates the field, so it says nothing
+     * about how many providers the capability admits. It used to pin `false` — the mirror of
+     * the rich record's `true` — and between the two, cardinality was decided by SPELLING.
+     * Neither pin was a policy; §3.1's exclusive-by-default was retired in P17.3 for the same
+     * reason (ADR-0037).
      */
     public static function fromInterface(string $interface): self
     {
@@ -118,8 +137,14 @@ final class CapabilityProvision
         return new self(
             id: $interface,
             interface: $interface,
-            contractVersion: '0.0.0',
-            exclusive: false,
+            // NOT '0.0.0'. A legacy declaration says nothing about the contract version, and
+            // `0.0.0` is a real version: against `^1.0` it reads as "too old", which is a
+            // different statement from "nobody said". Measured in `settlement-q-p17.md` —
+            // the engine rejected legacy providers for a reason it invented.
+            contractVersion: null,
+            // Tampoco `false`: una declaración legacy es anterior al campo, así que no dice nada
+            // sobre la multiplicidad. Fijar `false` aquí era decidir por quien no decidió.
+            exclusive: null,
         );
     }
 

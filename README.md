@@ -93,6 +93,26 @@ $v->isStable();                                    // true — no pre-release ta
 
 Every public symbol carries a DocBlock — the API reference is generated straight from them.
 
+### One law for capability identity
+
+`Milpa\Services\CapabilityMatcher` is the single criterion for *"is this provision the thing that
+requirement is asking for?"*. It lives here, in the package with no dependencies, because everyone
+who asks that question has to get the same answer:
+
+```php
+$matcher->identityMatches($provision, $requirement);   // is it the same capability?
+$matcher->satisfies($provision, $requirement);         // …and does the contract version fit?
+```
+
+The two are separate because they are asked at different moments. Before boot, nothing knows contract
+versions yet, and asking whether the capability *exists at all* is a different question from whether
+the version fits — collapsing them makes a missing provider and an incompatible one look identical to
+whoever has to fix it.
+
+It exists because there were **four** implementations of this comparison in the family and they did
+not agree. Four comparisons of the same thing are four chances to disagree; the only question is
+when.
+
 ## Requirements
 
 - PHP **≥ 8.3**

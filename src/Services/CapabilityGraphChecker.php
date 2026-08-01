@@ -35,20 +35,35 @@ use Milpa\Exceptions\Plugin\PluginDependencyException;
  *
  * This check only reasons about IDENTITY (does *some* plugin provide the
  * required thing at all), never about `contractVersion`/`constraint`
- * ranges — range-checking is the architecture resolver's job. A
- * `#[PluginMetadata]` entry may be a bare interface FQCN (legacy) or a
- * structured capability record (canonical — T087): a bare string is one
- * identity, verbatim; a record provides BOTH its capability `id` and its
- * `interface`, and a record requirement is satisfied by its `id`, its
- * `interface`, or any of its `oneOf` alternatives (a requirement the
- * resolver would satisfy via `oneOf` must not fail pre-boot here). A
- * record entry with no readable identity contributes nothing — teaching
- * the malformed-record failure is the ingestion layer's job
+ * ranges — range-checking is the architecture resolver's job. That layering
+ * is deliberate and survives; what did NOT survive is this class having its
+ * own idea of what "the same capability" means. Identity now comes from
+ * {@see CapabilityMatcher}, the single criterion the resolver, the manifest
+ * validator and the inspector all consume (`settlement-q-p17.md` measured
+ * four comparators disagreeing).
+ *
+ * A `#[PluginMetadata]` entry may be a bare interface FQCN (legacy) or a
+ * structured capability record (canonical — T087), and the matcher treats
+ * `php:Acme\Thing` and `Acme\Thing` as one identity so both forms coexist. A
+ * record offers BOTH its `id` and its `interface`, and a record requirement is
+ * satisfied by either or by any of its `oneOf` alternatives (a requirement the
+ * resolver would satisfy via `oneOf` must not fail pre-boot here). A record
+ * entry with no readable identity contributes nothing — teaching the
+ * malformed-record failure is the ingestion layer's job
  * ({@see \Milpa\ValueObjects\Capability\CapabilityProvision::fromArray()}),
  * not this check's.
  */
 final class CapabilityGraphChecker
 {
+    /**
+     * @param CapabilityMatcher $matcher The single identity criterion. Injectable so a
+     *                                   consumer can share one instance; the default is
+     *                                   the same law, not a different one.
+     */
+    public function __construct(private readonly CapabilityMatcher $matcher = new CapabilityMatcher())
+    {
+    }
+
     /**
      * Checks that every `requires` entry across `$plugins` is matched by a
      * `provides` entry somewhere in `$plugins` (including, if declared, the
@@ -70,7 +85,7 @@ final class CapabilityGraphChecker
         $provided = [];
         foreach ($metadata as $meta) {
             foreach ($meta->provides as $entry) {
-                foreach ($this->identitiesOf($entry) as $identity) {
+                foreach ($this->matcher->identitiesOffered($entry) as $identity) {
                     $provided[$identity] = true;
                 }
             }
@@ -78,84 +93,39 @@ final class CapabilityGraphChecker
 
         foreach ($metadata as $meta) {
             foreach ($meta->requires as $entry) {
-                $alternatives = $this->alternativesOf($entry);
+                $alternatives = $this->matcher->identitiesAccepted($entry);
                 if ($alternatives === []) {
                     continue;
                 }
-                if (!$this->anyProvided($provided, $alternatives)) {
-                    throw PluginDependencyException::unmet($meta->name, $alternatives[0]);
+                if (array_intersect($alternatives, array_keys($provided)) === []) {
+                    throw PluginDependencyException::unmet($meta->name, $this->nameOf($entry, $alternatives[0]));
                 }
             }
         }
     }
 
     /**
-     * The identity strings one capability entry contributes: the string itself
-     * (verbatim) for a bare FQCN, or the record's `id` and `interface` for a
-     * structured capability record. An entry that is neither yields nothing.
+     * How the unmet requirement is named in the failure message: as it was
+     * written, not as it was canonicalized. A developer who declared
+     * `\Acme\Thing` should read `\Acme\Thing` back, not a normalized form they
+     * never typed.
      *
-     * @return list<string>
+     * @param string|array<string, mixed> $entry
      */
-    private function identitiesOf(mixed $entry): array
+    private function nameOf(string|array $entry, string $fallback): string
     {
         if (is_string($entry)) {
-            return [$entry];
+            return $entry;
         }
 
-        if (!is_array($entry)) {
-            return [];
-        }
-
-        $identities = [];
         foreach (['id', 'interface'] as $key) {
             $value = $entry[$key] ?? null;
             if (is_string($value) && trim($value) !== '') {
-                $identities[] = trim($value);
+                return trim($value);
             }
         }
 
-        return $identities;
-    }
-
-    /**
-     * Every identity that can satisfy one `requires` entry: its own identities
-     * plus any `oneOf` alternatives a structured record declares. The FIRST
-     * entry (a record's `id`, or the bare FQCN itself) names the requirement
-     * in failure messages.
-     *
-     * @return list<string>
-     */
-    private function alternativesOf(mixed $entry): array
-    {
-        $alternatives = $this->identitiesOf($entry);
-
-        if (is_array($entry)) {
-            $oneOf = $entry['oneOf'] ?? [];
-            foreach (is_array($oneOf) ? $oneOf : [] as $candidate) {
-                if (is_string($candidate) && trim($candidate) !== '') {
-                    $alternatives[] = trim($candidate);
-                }
-            }
-        }
-
-        return $alternatives;
-    }
-
-    /**
-     * Whether any of the requirement's alternatives is in the provided set.
-     *
-     * @param array<string, true> $provided
-     * @param list<string>        $alternatives
-     */
-    private function anyProvided(array $provided, array $alternatives): bool
-    {
-        foreach ($alternatives as $alternative) {
-            if (isset($provided[$alternative])) {
-                return true;
-            }
-        }
-
-        return false;
+        return $fallback;
     }
 
     /**

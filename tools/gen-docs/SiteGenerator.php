@@ -60,8 +60,12 @@ final class SiteGenerator
         $shell = new Shell($this->cssBase, $this->version, $this->config);
         $renderer = new ApiRenderer();
 
-        $navForRoot = $this->buildNav($groups, '');
-        $navForType = $this->buildNav($groups, '../');
+        // Las guías van ANTES de la referencia en el nav, y no es estética: quien llega a un sitio
+        // de docs por primera vez no busca una clase, busca por dónde empezar. La referencia es lo
+        // que se consulta después, cuando ya se sabe qué se está buscando.
+        $guias = $this->discoverNarrative();
+        $navForRoot = $this->buildNarrativeNav($guias, '') . $this->buildNav($groups, '');
+        $navForType = $this->buildNarrativeNav($guias, '../') . $this->buildNav($groups, '../');
 
         $this->ensureDir($this->outDir);
 
@@ -78,11 +82,101 @@ final class SiteGenerator
             }
         }
 
-        $indexPage = $shell->page($this->config->brand . ' API', $navForRoot, $this->buildIndexMain($groups), '');
+        $sinClasificar = 0;
+        if ($guias !== []) {
+            $guiaDir = $this->outDir . '/guias';
+            $this->ensureDir($guiaDir);
+            foreach ($guias as $slug => $g) {
+                $md = new Markdown();
+                $main = $md->render((string) file_get_contents($g['path']));
+                $sinClasificar += $md->unclassified();
+                $toc = $this->buildToc(array_map(
+                    static fn (array $h): array => ['#' . $h[0], $h[1]],
+                    $md->headings(),
+                ));
+                file_put_contents(
+                    $guiaDir . '/' . $slug . '.html',
+                    $shell->page($g['title'], $navForType, $main, $toc)
+                );
+                $count++;
+            }
+            // Se DICE cuántas líneas no encajaron en el subconjunto de Markdown. Una línea mal
+            // clasificada sale como párrafo y se ve idéntica a un párrafo de verdad; el número es lo
+            // único que distingue «se renderizó» de «se degradó sin que nadie lo note».
+            if ($sinClasificar > 0) {
+                fwrite(STDERR, sprintf(
+                    "gen-docs: %d línea(s) narrativa(s) no encajaron en el subconjunto de Markdown y salieron como párrafo\n",
+                    $sinClasificar,
+                ));
+            }
+        }
+
+        $indexPage = $shell->page(
+            $this->config->brand . ' API',
+            $navForRoot,
+            $this->buildIndexMain($groups),
+            ''
+        );
         file_put_contents($this->outDir . '/index.html', $indexPage);
         $count++;
 
         return $count;
+    }
+
+    /**
+     * Las guías narrativas del paquete, por orden de nombre de archivo.
+     *
+     * El orden sale del NOMBRE, no del contenido: `01-quickstart.md` antes que `02-plugins.md`. Un
+     * orden implícito —fecha de modificación, orden del sistema de archivos— cambiaría la navegación
+     * sin que nadie lo haya editado.
+     *
+     * @return array<string, array{path: string, title: string}>
+     */
+    private function discoverNarrative(): array
+    {
+        $dir = \dirname($this->srcRoot) . '/' . trim($this->config->narrativeDir, '/');
+        if (!is_dir($dir)) {
+            return [];
+        }
+
+        $encontradas = [];
+        $archivos = glob($dir . '/*.md') ?: [];
+        sort($archivos);
+        foreach ($archivos as $archivo) {
+            $base = basename($archivo, '.md');
+            // El título sale del primer `# ` del propio archivo: escribirlo dos veces —en el nombre y
+            // en el encabezado— es garantizar que un día no coincidan.
+            $titulo = $base;
+            foreach (preg_split('/\R/', (string) file_get_contents($archivo)) ?: [] as $linea) {
+                if (preg_match('/^#\s+(.+)$/', $linea, $m)) {
+                    $titulo = trim($m[1]);
+                    break;
+                }
+            }
+            $slug = preg_replace('/^\d+[-_]/', '', $base) ?? $base;
+            $encontradas[$slug] = ['path' => $archivo, 'title' => $titulo];
+        }
+
+        return $encontradas;
+    }
+
+    /**
+     * @param array<string, array{path: string, title: string}> $guias
+     */
+    private function buildNarrativeNav(array $guias, string $prefix): string
+    {
+        if ($guias === []) {
+            return '';
+        }
+
+        $html = '<div class="mui-docs__nav-group"><p class="mui-docs__nav-heading">Guías</p>';
+        foreach ($guias as $slug => $g) {
+            $href = $prefix . 'guias/' . $slug . '.html';
+            $html .= '<a class="mui-docs__nav-item" href="' . self::esc($href) . '">'
+                . self::esc($g['title']) . '</a>';
+        }
+
+        return $html . '</div>';
     }
 
     /**
