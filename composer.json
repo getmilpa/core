@@ -10,7 +10,7 @@
     "value-objects",
     "framework-agnostic"
   ],
-  "type": "library",
+  "type": "milpa-capability",
   "license": "Apache-2.0",
   "authors": [
     {
@@ -47,5 +47,23 @@
     "phpstan/phpstan": "^2.1",
     "phpstan/phpdoc-parser": "^2.3",
     "friendsofphp/php-cs-fixer": "^3.65"
+  },
+  "extra": {
+    "milpa": {
+      "capability": {
+        "id": "core",
+        "title": "The contracts and primitives every Milpa piece agrees on",
+        "unlocks": [],
+        "provides": [
+          "core.contracts",
+          "event.dispatcher"
+        ],
+        "briefing": "The shared vocabulary of contracts this app is built on.",
+        "contracts": {
+          "core.contracts": "Milpa\\Interfaces\\Plugin\\PluginInterface",
+          "event.dispatcher": "Milpa\\Interfaces\\Event\\MilpaEventDispatcherInterface"
+        }
+      }
+    }
   }
 }
