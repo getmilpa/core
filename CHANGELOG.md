@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/getmilpa/core/compare/v0.7.1...v0.8.0) (2026-08-14)
+
+
+### Features
+
+* a plugin can declare the words a human would use for it ([#15](https://github.com/getmilpa/core/issues/15)) ([7e1ab91](https://github.com/getmilpa/core/commit/7e1ab9171985b43cd9a316cf5c264562958c78b2))
+
 ## [0.7.1](https://github.com/getmilpa/core/compare/v0.7.0...v0.7.1) (2026-08-04)
 
 
