@@ -58,6 +58,10 @@ class PluginMetadata
      * @param array<class-string|array<string, mixed>> $suggests Optional capabilities (soft dependency):
      *                                                           a bare interface FQCN or a record `{id, interface, constraint,
      *                                                           fallback?}` ({@see \Milpa\ValueObjects\Capability\CapabilitySuggestion}).
+     * @param list<string>                             $aliases  The words a human would use for this plugin, so the app can
+     *                                                           resolve a reference instead of asking a model to guess one.
+     *                                                           They REFER; they do not operate — every operation keeps
+     *                                                           taking the real name and only the real name.
      */
     public function __construct(
         public readonly string $version,
@@ -67,7 +71,22 @@ class PluginMetadata
         public readonly string $type,
         public readonly array $provides = [],
         public readonly array $requires = [],
-        public readonly array $suggests = []
+        public readonly array $suggests = [],
+        // ── EL VOCABULARIO CON EL QUE UN HUMANO SE REFIERE (greenhouse evidence/0193) ───────────
+        //
+        // Hasta aquí un plugin declaraba `name` y nada con lo que alguien lo llamara, así que la
+        // única identidad que la app tenía de sus propias partes era el nombre de clase. Medido:
+        // «hello» se resuelve porque es un prefijo literal de `HelloPlugin`, y «hola» no, porque
+        // NADA en la app sabe que hola es Hello. El agente no tiene la culpa de eso — el dato no
+        // existía.
+        //
+        // **Un alias DECLARADO es identidad que el sistema conoce; un parecido no lo es.** Por eso
+        // se declara y no se deriva: derivarlo sería adivinanza con otro nombre.
+        //
+        // Y NO es un segundo identificador. Sirve para REFERIRSE, no para operar: las operaciones
+        // siguen aceptando el nombre real y sólo el nombre real, o habría dos llaves para la misma
+        // puerta y un día una no pasaría por la misma compuerta.
+        public readonly array $aliases = [],
     ) {
     }
 }
