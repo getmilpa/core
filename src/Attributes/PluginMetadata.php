@@ -58,6 +58,10 @@ class PluginMetadata
      * @param array<class-string|array<string, mixed>> $suggests Optional capabilities (soft dependency):
      *                                                           a bare interface FQCN or a record `{id, interface, constraint,
      *                                                           fallback?}` ({@see \Milpa\ValueObjects\Capability\CapabilitySuggestion}).
+     * @param list<string>                             $aliases  The words a human would use for this plugin, so the app can
+     *                                                           resolve a reference instead of asking a model to guess one.
+     *                                                           They REFER; they do not operate — every operation keeps
+     *                                                           taking the real name and only the real name.
      */
     public function __construct(
         public readonly string $version,
@@ -82,8 +86,6 @@ class PluginMetadata
         // Y NO es un segundo identificador. Sirve para REFERIRSE, no para operar: las operaciones
         // siguen aceptando el nombre real y sólo el nombre real, o habría dos llaves para la misma
         // puerta y un día una no pasaría por la misma compuerta.
-        //
-        // @var list<string>
         public readonly array $aliases = [],
     ) {
     }
