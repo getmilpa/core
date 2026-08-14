@@ -105,6 +105,42 @@ final class PluginMetadataTest extends TestCase
         $this->assertSame('Fake', $instance->name);
         $this->assertSame(['FakeInterface'], $instance->provides);
     }
+    // ── EL VOCABULARIO CON EL QUE UN HUMANO SE REFIERE (greenhouse evidence/0193) ───────────────
+    //
+    // Un plugin declaraba `name` y nada con lo que alguien lo llamara. Medido: «hello» se resuelve
+    // porque es un prefijo literal de `HelloPlugin`, y «hola» no, porque NADA en la app sabe que
+    // hola es Hello. El agente no tiene la culpa de eso: la app no tiene el dato.
+    //
+    // Un alias DECLARADO es identidad que el sistema conoce; un parecido no lo es. Por eso se
+    // declara y no se deriva — lo contrario sería adivinanza con otro nombre.
+
+    public function testAPluginCanDeclareTheWordsAHumanWouldUse(): void
+    {
+        $meta = new PluginMetadata(
+            version: '1.0.0',
+            author: 'TeamX',
+            site: 'https://teamx.agency',
+            name: 'HelloPlugin',
+            type: 'Web',
+            aliases: ['hola', 'saludo'],
+        );
+
+        self::assertSame(['hola', 'saludo'], $meta->aliases);
+    }
+
+    /** Sin alias se comporta como siempre: el campo es opcional y no rompe a quien ya declaraba. */
+    public function testAPluginThatDeclaresNoneKeepsWorking(): void
+    {
+        $meta = new PluginMetadata(
+            version: '1.0.0',
+            author: 'TeamX',
+            site: 'https://teamx.agency',
+            name: 'HelloPlugin',
+            type: 'Web',
+        );
+
+        self::assertSame([], $meta->aliases);
+    }
 }
 
 #[PluginMetadata(
