@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/getmilpa/core/compare/v0.8.0...v0.9.0) (2026-08-27)
+
+
+### Features
+
+* **support:** a Clock primitive — time as an input for deterministic replay ([#19](https://github.com/getmilpa/core/issues/19)) ([120157e](https://github.com/getmilpa/core/commit/120157efbda4b196908c9e533f79342df5857900))
+
 ## [0.7.1](https://github.com/getmilpa/core/compare/v0.7.0...v0.7.1) (2026-08-04)
 
 
