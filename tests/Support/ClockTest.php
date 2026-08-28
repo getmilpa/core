@@ -20,10 +20,13 @@ final class ClockTest extends TestCase
         self::assertInstanceOf(Clock::class, $clock);
         self::assertSame('2026-08-27T00:00:00+00:00', $clock->now());
         self::assertSame($clock->now(), $clock->now(), 'the fixed clock returns the same instant every call');
+        self::assertInstanceOf(\DateTimeImmutable::class, $clock->instant());
+        self::assertSame($clock->now(), $clock->instant()->format('c'), 'instant() and now() derive from the same fixed source');
     }
 
     public function testTheSystemClockReadsAnIsoInstant(): void
     {
         self::assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}T/', (new SystemClock())->now());
+        self::assertInstanceOf(\DateTimeImmutable::class, (new SystemClock())->instant());
     }
 }
