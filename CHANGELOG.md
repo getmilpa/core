@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/getmilpa/core/compare/v0.9.0...v0.10.0) (2026-08-28)
+
+
+### Features
+
+* **support:** Clock gains instant() beside now() — a DateTimeImmutable for domain runtimes ([#22](https://github.com/getmilpa/core/issues/22)) ([e1678c8](https://github.com/getmilpa/core/commit/e1678c8726bbed0a4f95738dfde8bd522531fb10))
+
 ## [0.9.0](https://github.com/getmilpa/core/compare/v0.8.0...v0.9.0) (2026-08-27)
 
 
