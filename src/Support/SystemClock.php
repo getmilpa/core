@@ -24,4 +24,10 @@ final class SystemClock implements Clock
     {
         return date('c');
     }
+
+    /** The real current instant as a UTC {@see \DateTimeImmutable} — non-deterministic. */
+    public function instant(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    }
 }
