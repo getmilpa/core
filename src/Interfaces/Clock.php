@@ -25,4 +25,11 @@ interface Clock
 {
     /** The current instant as an ISO-8601 string (the shape a document/state stamps). */
     public function now(): string;
+
+    /**
+     * The same instant as a {@see \DateTimeImmutable} — the shape a domain runtime compares and formats
+     * (the ResearchLabs ActorRuntime wanted this; a string was too lossy, so it forked its own port). A
+     * consistent clock derives {@see now()} and {@see instant()} from the same source (greenhouse decisions/0131).
+     */
+    public function instant(): \DateTimeImmutable;
 }

@@ -28,4 +28,13 @@ final class FixedClock implements Clock
     {
         return $this->instant;
     }
+
+    /**
+     * The same fixed instant as a {@see \DateTimeImmutable} — derived from the very string {@see now()}
+     * returns, so a consumer that compares/formats replays byte-identical: {@see instant()}->format('c') === {@see now()}.
+     */
+    public function instant(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable($this->instant);
+    }
 }
