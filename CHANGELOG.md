@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0](https://github.com/getmilpa/core/compare/v0.11.0...v0.12.0) (2026-09-08)
+
+
+### Features
+
+* a package can list the events it dispatches without constructing its emitters ([#29](https://github.com/getmilpa/core/issues/29)) ([d9e09b4](https://github.com/getmilpa/core/commit/d9e09b43562442f32c6b65eb2b4f8ec5a233420d))
+
 ## [0.11.0](https://github.com/getmilpa/core/compare/v0.10.0...v0.11.0) (2026-09-08)
 
 
