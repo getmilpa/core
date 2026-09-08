@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/getmilpa/core/compare/v0.10.0...v0.11.0) (2026-09-08)
+
+
+### Features
+
+* events declare themselves — EventDeclaration and the DeclaredEvents contract ([#26](https://github.com/getmilpa/core/issues/26)) ([d0431c7](https://github.com/getmilpa/core/commit/d0431c7117e0ee59c9547da8ad52336472d76a93))
+
 ## [0.10.0](https://github.com/getmilpa/core/compare/v0.9.0...v0.10.0) (2026-08-28)
 
 
