@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/getmilpa/core/compare/v0.12.0...v0.13.0) (2026-11-04)
+
+
+### Features
+
+* Support\ShellArgument quotes a shell argument byte for byte, whatever the locale ([#34](https://github.com/getmilpa/core/issues/34)) ([1f3f9f0](https://github.com/getmilpa/core/commit/1f3f9f09fd727cd1f915f4a3249d6aef57a7606b))
+
 ## [0.12.0](https://github.com/getmilpa/core/compare/v0.11.0...v0.12.0) (2026-09-08)
 
 
